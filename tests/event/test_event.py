@@ -3,5 +3,6 @@ from evbax.event.event import Event
 
 
 def test_event_instantiation():
-    with pytest.raises(TypeError):
-        Event(), "Event object should not be instantiable"
+    e = Event()
+    with pytest.raises(AttributeError):
+        assert e.type, "Event object should not have a type"

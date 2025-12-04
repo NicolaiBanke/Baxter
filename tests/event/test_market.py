@@ -1,5 +1,7 @@
 import pytest
-from evbax.event.market import Market
+from evbax.event.market import MarketEvent
 
-def test_market_event():
-    with pytest.raises()
+
+def test_has_type_mkt():
+    me = MarketEvent()
+    assert me.type == "MKT"
