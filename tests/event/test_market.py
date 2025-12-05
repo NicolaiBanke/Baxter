@@ -1,4 +1,3 @@
-import pytest
 from evbax.event.market import MarketEvent
 
 
