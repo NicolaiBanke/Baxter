@@ -1,5 +1,5 @@
 from evbax.event.order import OrderEvent
-from evbax.types.event_type import EventType
+from evbax.event.event import EventType
 
 
 def test_has_type_order(order_args):
