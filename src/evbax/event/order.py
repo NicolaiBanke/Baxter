@@ -1,6 +1,5 @@
-from evbax.event.event import Event
-from evbax.types.order_type import OrderType
-from evbax.types.event_type import EventType
+from enum import Enum
+from evbax.event.event import Event, EventType
 
 
 class OrderEvent(Event):
@@ -25,3 +24,16 @@ class OrderEvent(Event):
         self.quantity = quantity
         self.direction = direction
         self.order_type = order_type
+
+
+class OrderType(Enum):
+    """
+    Docstring for OrderType
+
+    The different types of orders.
+
+    MKT = 'Market order'
+    LIM = 'Limit order'
+    """
+    MKT = "Market order"
+    LIM = "Limit order"
