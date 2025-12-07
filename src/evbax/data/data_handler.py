@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from typing import List
 
 
 class DataHandler(ABC):
@@ -10,9 +11,8 @@ class DataHandler(ABC):
     send off data into the event loop.
     """
 
+    @abstractmethod
+    def get_latest_bars(self, symbol, N=1) -> List | None: ...
 
     @abstractmethod
-    def get_latest_bars(self, N=1): ...#forgot 'symbol' parameter
-
-    @abstractmethod
-    def update_bars(self): ...
+    def update_bars(self) -> None: ...
