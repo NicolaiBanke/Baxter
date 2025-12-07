@@ -1,5 +1,5 @@
 from evbax.event.event import Event
-from evbax.types.event_type import EventType
+from evbax.event.event import EventType
 from datetime import datetime
 
 
