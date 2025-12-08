@@ -1,6 +1,6 @@
 from queue import Queue
 from .data_handler import DataHandler
-from evbax.event.market import MarketEvent
+from baxter.event.market import MarketEvent
 from typing import List, Iterator, Dict, Hashable, Any, Generator
 import pandas as pd
 from pathlib import Path
