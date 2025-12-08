@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 from queue import Queue
-from evbax.event.market import MarketEvent
+from baxter.event.market import MarketEvent
 from typing import Tuple, List
 
 
@@ -39,4 +39,4 @@ def order_args():
 @pytest.fixture(scope="module")
 def data_handler_args(events_queue) -> Tuple[Queue, str, List[str]]:
     # events, hdf5_dir, symbol_list
-    return (events_queue, "/home/n1c0/Dropbox/Quant/Projects/event-driven-baxter/tests/test_hdf5data.h5", ["SPY", "QQQ"])
+    return (events_queue, "/home/n1c0/Dropbox/Quant/Projects/baxter/tests/test_hdf5data.h5", ["SPY", "QQQ"])

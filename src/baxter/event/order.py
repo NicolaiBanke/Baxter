@@ -1,5 +1,5 @@
 from enum import Enum
-from evbax.event.event import Event, EventType
+from baxter.event.event import Event, EventType
 
 
 class OrderEvent(Event):
@@ -18,8 +18,11 @@ class OrderEvent(Event):
     - order_type: 'MKT' (market order) or 'LIM' (limit order)
     """
 
+    @property
+    def type(self):
+        return EventType.ORDER
+
     def __init__(self, symbol: str, quantity: int, direction: str, order_type: OrderType):
-        self.type = EventType.ORDER
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction

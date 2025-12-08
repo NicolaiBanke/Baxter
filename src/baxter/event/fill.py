@@ -1,5 +1,5 @@
-from evbax.event.event import Event
-from evbax.event.event import EventType
+from baxter.event.event import Event
+from baxter.event.event import EventType
 from datetime import datetime
 
 
@@ -21,8 +21,11 @@ class FillEvent(Event):
     - time_index: the timestamp of the fill?  <-- brush up
     """
 
+    @property
+    def type(self):
+        return EventType.FILL
+
     def __init__(self, symbol: str, quantity: int, direction: str, exchange: str, fill_cost: float, time_index: datetime):
-        self.type = EventType.FILL
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction
