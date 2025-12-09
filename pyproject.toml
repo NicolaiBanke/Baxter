@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "baxter"
+version = "0.0.1"
+
+[project.scripts]
+bax = "baxter.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
