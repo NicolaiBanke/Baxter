@@ -1,1 +1,4 @@
 # Baxter
+The title of the project comes from a mix of the words _backtester_ and _saxo_, since it was conceived of as a backtester connected to the [SaxoTrader](https://www.home.saxo/platforms/saxotrader) trading platform. The project is, so far, mostly inspired by a series of [articles](https://www.quantstart.com/articles/Event-Driven-Backtesting-with-Python-Part-I/) outlining the basic principles of event-driven backtesting. The project is still in a development phase and as such has no useful functionality. A number of modules and interfaces have been developed, however, along with a minor test suite using `pytest`.
+
+As a first milestone, an `ExecutionHandler` which handles the order interactions with SaxoTrader's API, should be implemented to enable paper trading and allowing incubation of trading strategies.
