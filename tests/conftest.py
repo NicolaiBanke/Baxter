@@ -3,6 +3,7 @@ from datetime import datetime
 from queue import Queue
 from baxter.event.market import MarketEvent
 from typing import Tuple, List
+from baxter.data.data_handler import DataHandler
 
 
 # generic Queue object with a single MarketEvent in it

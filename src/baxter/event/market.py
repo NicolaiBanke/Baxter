@@ -9,10 +9,7 @@ class MarketEvent(Event):
     of the market. It should have no functionality
     (so far), and should only be identified with its type. 
     """
-    
+
     @property
     def type(self):
         return EventType.MKT
-
-#    def __init__(self):
- #       self.type = type

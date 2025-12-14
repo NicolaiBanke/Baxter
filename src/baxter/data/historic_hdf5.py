@@ -1,7 +1,7 @@
 from queue import Queue
-from .data_handler import DataHandler
+from .data_handler import DataHandler, BarType
 from baxter.event.market import MarketEvent
-from typing import List, Iterator, Dict, Hashable, Any, Generator
+from typing import List, Iterator, Dict, Hashable, Generator
 import pandas as pd
 from pathlib import Path
 import datetime
@@ -39,14 +39,18 @@ class HistoricHDF5DataHandler(DataHandler):
 
         self.events = events
         self.hdf5_dir = Path(hdf5_dir)
-        self.symbol_list = symbol_list
+        self._symbol_list = symbol_list
 
         self.symbol_data: Dict[str,
-                               Iterator[tuple[Hashable, pd.Series[Any]]] | Any] = {}
-        self.latest_symbol_data: Dict[str, List] = {}
+                               Iterator[tuple[Hashable, pd.Series[float]]]] = {}
+        self.latest_symbol_data: Dict[str, List[BarType]] = {}
         self.continue_backtest = True
 
         self._open_convert_hdf5_files()
+    
+    @property
+    def symbol_list(self):
+        return self._symbol_list
 
     def update_bars(self) -> None:
 
@@ -63,7 +67,7 @@ class HistoricHDF5DataHandler(DataHandler):
         # when each symbol has its latest bar, emit a new MarketEvent to continue the event loop
         self.events.put(MarketEvent())
 
-    def get_latest_bars(self, symbol: str, N=1) -> List | None:
+    def get_latest_bars(self, symbol: str, N=1) -> List[BarType] | None:
         """
         Docstring for get_latest_bars
 
@@ -127,7 +131,8 @@ class HistoricHDF5DataHandler(DataHandler):
             self.symbol_data[ticker] = temp_data[ticker].reindex(
                 index=comb_index, method="ffill").iterrows()
 
-    def _get_new_bar(self, symbol: str) -> Generator:
+    # Generator[Tuple[str, datetime.datetime, *Tuple[Any, ...]]]:
+    def _get_new_bar(self, symbol: str) -> Generator[BarType]:
         """
         Docstring for _get_new_bar
 
@@ -141,4 +146,6 @@ class HistoricHDF5DataHandler(DataHandler):
         and corresponding to a single point in time. 
         """
         for datum in self.symbol_data[symbol]:
-            yield (symbol, datetime.datetime.strptime(str(datum[0]), "%Y-%m-%d %H:%M:%S"), *datum[1])
+            row = (symbol, datetime.datetime.strptime(
+                str(datum[0]), "%Y-%m-%d %H:%M:%S"), *datum[1])
+            yield row
