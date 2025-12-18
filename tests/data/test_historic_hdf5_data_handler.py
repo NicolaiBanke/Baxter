@@ -1,5 +1,5 @@
 from inspect import isgenerator
-from baxter.data.historic_hdf5 import HistoricHDF5DataHandler
+from data.historic_hdf5 import HistoricHDF5DataHandler
 from queue import Queue
 
 
