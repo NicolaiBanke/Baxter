@@ -1,4 +1,4 @@
-from event import Event, EventType
+from .event import Event, EventType
 from datetime import datetime
 from enum import Enum
 

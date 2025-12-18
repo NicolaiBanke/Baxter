@@ -1,4 +1,4 @@
-from baxter.event.event import Event, EventType
+from event.event import Event, EventType
 
 
 class MarketEvent(Event):

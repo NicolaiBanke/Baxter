@@ -1,7 +1,6 @@
 from abc import abstractmethod, ABC
 from typing import List, Tuple
 from datetime import datetime
-from queue import Queue
 
 type BarType = Tuple[str, datetime, *Tuple[float, ...]]
 

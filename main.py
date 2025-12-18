@@ -1,7 +1,7 @@
 from queue import Queue, Empty
-from baxter.event.event import Event, EventType
-from baxter.data.data_handler import DataHandler
-from baxter.data.historic_hdf5 import HistoricHDF5DataHandler
+from event.event import Event, EventType
+from data.data_handler import DataHandler
+from data.historic_hdf5 import HistoricHDF5DataHandler
 
 data_path = "/home/n1c0/Dropbox/Quant/Projects/baxter/tests"
 symbols = ["SPY", "QQQ"]

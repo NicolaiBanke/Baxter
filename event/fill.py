@@ -1,5 +1,5 @@
-from baxter.event.event import Event
-from baxter.event.event import EventType
+from event.event import Event
+from event.event import EventType
 from datetime import datetime
 
 
