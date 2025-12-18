@@ -1,0 +1,7 @@
+[project]
+name = "baxter"
+version = "0.1.0"
+description = "An event-driven backtester for quantitative trading strategies."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
