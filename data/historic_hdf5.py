@@ -1,7 +1,7 @@
 from queue import Queue
 from .data_handler import DataHandler, BarType
-from ..event.market import MarketEvent
-from typing import List, Iterator, Dict, Hashable, Generator
+from event.market import MarketEvent
+from typing import List, Iterator, Dict, Hashable, Generator, Iterable
 import pandas as pd
 from pathlib import Path
 import datetime
@@ -24,7 +24,7 @@ class HistoricHDF5DataHandler(DataHandler):
     DataHandler for handling historic .h5 files.
     """
 
-    def __init__(self, events: Queue, hdf5_dir: str, symbol_list: List[str]) -> None:
+    def __init__(self, events: Queue, hdf5_dir: str, symbol_list: Iterable[str]) -> None:
         """
         Docstring for __init__
 
@@ -64,6 +64,14 @@ class HistoricHDF5DataHandler(DataHandler):
             return TypeError("continue_backtest must be a boolean.")
 
     def update_bars(self) -> None:
+        """
+        Docstring for update_bars
+
+        :param self: Instance of DataHandler
+
+        Updates the self.latest_symbol_data attributes
+        with the latest bar for each ticker symbol.
+        """
 
         # iterate over each symbol and check if a new bar is available. If not, then stop the backtest.
         for symbol in self.symbol_list:
@@ -142,7 +150,6 @@ class HistoricHDF5DataHandler(DataHandler):
             self.symbol_data[ticker] = temp_data[ticker].reindex(
                 index=comb_index, method="ffill").iterrows()
 
-    # Generator[Tuple[str, datetime.datetime, *Tuple[Any, ...]]]:
     def _get_new_bar(self, symbol: str) -> Generator[BarType]:
         """
         Docstring for _get_new_bar

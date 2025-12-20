@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from typing import List, Tuple
+from typing import List, Tuple, Iterable
 from datetime import datetime
 
 type BarType = Tuple[str, datetime, *Tuple[float, ...]]
@@ -16,7 +16,7 @@ class DataHandler(ABC):
 
     @property
     @abstractmethod
-    def symbol_list(self) -> List[str]: ...
+    def symbol_list(self) -> Iterable[str]: ...
 
     @property
     @abstractmethod

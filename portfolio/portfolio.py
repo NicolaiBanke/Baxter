@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from ..event.signal import SignalEvent
-from ..event.fill import FillEvent
+from event.signal import SignalEvent
+from event.fill import FillEvent
 
 
 class Portfolio(ABC):

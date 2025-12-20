@@ -1,5 +1,5 @@
-from baxter.event.fill import FillEvent
-from baxter.event.event import EventType
+from event.fill import FillEvent
+from event.event import EventType
 
 
 def test_has_type_fill(fill_args):

@@ -1,8 +1,8 @@
-from ..event.event import EventType
-from ..event.market import MarketEvent
-from ..event.signal import SignalEvent, SignalType
-from ..strategy.strategy import Strategy
-from ..data.data_handler import DataHandler
+from event.event import EventType
+from event.market import MarketEvent
+from event.signal import SignalEvent, SignalType
+from strategy.strategy import Strategy
+from data.data_handler import DataHandler
 from queue import Queue
 
 

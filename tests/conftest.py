@@ -1,14 +1,14 @@
 import pytest
 from datetime import datetime
 from queue import Queue
-from baxter.event.market import MarketEvent
+from event.market import MarketEvent
 from typing import Tuple, List
-from baxter.data.data_handler import DataHandler
+from event.event import Event
 
 
 # generic Queue object with a single MarketEvent in it
 @pytest.fixture(scope="module")
-def events_queue() -> Queue:
+def events_queue() -> Queue[Event]:
     q = Queue()
     q.put(MarketEvent())
     return q
@@ -17,23 +17,23 @@ def events_queue() -> Queue:
 
 
 @pytest.fixture(scope="module")
-def symbol_list():
+def symbol_list() -> List[str]:
     return ["SPY", "QQQ"]
 
 # arguments for a generic FillEvent object
 
 
 @pytest.fixture(scope="module")
-def fill_args():
+def fill_args() -> Tuple[str, int, str, str, float, datetime]:
     # symbol, quantity, direction, exchange, fill_cost, time_index
-    return ["symbol", 1, "BUY", "exchange", 1.0, datetime.now()]
+    return ("symbol", 1, "BUY", "exchange", 1.0, datetime.now())
 
 
 # arguments for a generic OrderEvent object
 @pytest.fixture
-def order_args():
+def order_args() -> Tuple[str, int, str, str]:
     # symbol, quantity, direction, order_type
-    return ["symbol", 1, "BUY", "MKT"]
+    return ("symbol", 1, "BUY", "MKT")
 
 
 # arguments for a generic DataHandler subobject

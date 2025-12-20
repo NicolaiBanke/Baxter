@@ -1,5 +1,5 @@
-from baxter.event.order import OrderEvent
-from baxter.event.event import EventType
+from event.order import OrderEvent
+from event.event import EventType
 
 
 def test_has_type_order(order_args):

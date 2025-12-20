@@ -1,4 +1,4 @@
-from baxter.strategy.strategy import Strategy
+from strategy.strategy import Strategy
 
 
 def test_strategy_base_class():
