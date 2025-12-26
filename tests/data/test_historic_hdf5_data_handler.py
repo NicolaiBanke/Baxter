@@ -20,7 +20,6 @@ def test__get_new_bar(data_handler_args: Tuple[Queue[Event], str, List[str]]):
     assert isgenerator(h5dh._get_new_bar(data_handler_args[-1][0]))
 
 # Incoming query
-@pytest.importorskip("ImportError", reason="can't import 'pytables'")
 def test_get_latest_bars(data_handler_args: Tuple[Queue[Event], str, List[str]]):
     h5dh = HistoricHDF5DataHandler(*data_handler_args)
     bars = h5dh.get_latest_bars(data_handler_args[1], N=5)
@@ -29,8 +28,6 @@ def test_get_latest_bars(data_handler_args: Tuple[Queue[Event], str, List[str]])
     assert isinstance(bars, list | None)
 
 # Outgoing command
-
-
 def test_update_bars_put_marketevent(events_queue: Queue[Event], data_handler_args: Tuple[Queue[Event], str, List[str]]):
     before_size = data_handler_args[0].qsize()
     h5dh = HistoricHDF5DataHandler(*data_handler_args)
@@ -38,8 +35,6 @@ def test_update_bars_put_marketevent(events_queue: Queue[Event], data_handler_ar
     assert events_queue.qsize() == before_size + 1
 
 # Ingoing command
-
-
 def test_update_bars_sets_latest_symbol_data(data_handler_args: Tuple[Queue[Event], str, List[str]]):
     h5dh = HistoricHDF5DataHandler(*data_handler_args)
     try:
