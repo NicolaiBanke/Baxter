@@ -1,8 +1,9 @@
 from abc import abstractmethod, ABC
-from typing import List, Tuple, Iterable
+from typing import List, Tuple
 from datetime import datetime
+import numpy as np
 
-type BarType = Tuple[str, datetime, *Tuple[float, ...]]
+type BarType = Tuple[str, datetime, float, float, float, float, float]
 
 
 class DataHandler(ABC):
@@ -16,7 +17,7 @@ class DataHandler(ABC):
 
     @property
     @abstractmethod
-    def symbol_list(self) -> Iterable[str]: ...
+    def symbol_list(self) -> List[str]: ...
 
     @property
     @abstractmethod
@@ -27,7 +28,7 @@ class DataHandler(ABC):
     def continue_backtest(self, new_setting: bool) -> None: ...
 
     @abstractmethod
-    def get_latest_bars(self, symbol, N=1) -> List[BarType] | None: ...
+    def get_latest_bars(self, symbol, N=1) -> List[BarType]: ...
 
     @abstractmethod
     def update_bars(self) -> None: ...

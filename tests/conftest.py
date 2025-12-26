@@ -4,12 +4,24 @@ from queue import Queue
 from event.market import MarketEvent
 from typing import Tuple, List
 from event.event import Event
+from data.data_handler import DataHandler
+from data.data_handler import BarType
+import pandas as pd
 
+# generic batch of data
+@pytest.fixture(scope="module")
+def data() -> pd.DataFrame | pd.Series:
+    with pd.HDFStore("/home/n1c0/Dropbox/Quant/Projects/baxter/tests/test_hdf5data.h5") as store:
+        df = store.get("price_series/SPY")
+    
+    return df.head()
 
 # generic Queue object with a single MarketEvent in it
+
+
 @pytest.fixture(scope="module")
 def events_queue() -> Queue[Event]:
-    q = Queue()
+    q: Queue[Event] = Queue()
     q.put(MarketEvent())
     return q
 
@@ -41,3 +53,29 @@ def order_args() -> Tuple[str, int, str, str]:
 def data_handler_args(events_queue) -> Tuple[Queue, str, List[str]]:
     # events, hdf5_dir, symbol_list
     return (events_queue, "/home/n1c0/Dropbox/Quant/Projects/baxter/tests/test_hdf5data.h5", ["SPY", "QQQ"])
+
+
+@pytest.fixture(scope="module")
+def data_handler() -> DataHandler:
+    # generic DataHandler subclass
+    class DH(DataHandler):
+        @property
+        def symbol_list(self) -> List[str]: ...
+        
+        @property
+        def continue_backtest(self) -> bool: ...
+        
+        @continue_backtest.setter
+        def continue_backtest(self, new_setting: bool) -> None: ...
+        
+        def get_latest_bars(self, symbol, N=1) -> List[BarType]: ...
+        
+        def update_bars(self) -> None: ...
+    
+    return DH()
+
+
+# create a bar fixture
+@pytest.fixture(scope="module")
+def bar(data: pd.DataFrame | pd.Series) -> BarType:
+    return ("SPY", datetime.strptime(str(data.index[0]), "%Y-%m-%d %H:%M:%S"), *data.iloc[1])

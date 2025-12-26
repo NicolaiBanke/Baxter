@@ -13,9 +13,9 @@ class Portfolio(ABC):
     """
 
     @abstractmethod
-    def update_signal(self, event: SignalEvent):
+    def update_signal(self, signal_event: SignalEvent) -> None:
         raise NotImplementedError("Should implement .update_signal")
 
     @abstractmethod
-    def update_fill(self, event: FillEvent):
+    def update_fill(self, fill_event: FillEvent) -> None:
         raise NotImplementedError("Shoul implement .update_fill")

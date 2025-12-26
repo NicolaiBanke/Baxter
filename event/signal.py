@@ -12,6 +12,7 @@ class SignalType(Enum):
 
     LONG = "Long"
     SHORT = "Short"
+    EXIT = "Exit"
 
 
 class SignalEvent(Event):
