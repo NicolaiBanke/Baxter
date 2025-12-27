@@ -4,4 +4,20 @@ version = "0.1.0"
 description = "An event-driven backtester for quantitative trading strategies."
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "pandas>=2.3.3",
+    "tables>=3.10.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.14.10",
+]
+
+[tool.ruff.lint]
+extend-select = ["B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

@@ -1,8 +1,9 @@
 from queue import Queue
 from .data_handler import DataHandler, BarType
-from baxter.event.market import MarketEvent
+from event.market import MarketEvent
 from typing import List, Iterator, Dict, Hashable, Generator
 import pandas as pd
+import numpy as np
 from pathlib import Path
 import datetime
 
@@ -64,6 +65,14 @@ class HistoricHDF5DataHandler(DataHandler):
             return TypeError("continue_backtest must be a boolean.")
 
     def update_bars(self) -> None:
+        """
+        Docstring for update_bars
+
+        :param self: Instance of DataHandler
+
+        Updates the self.latest_symbol_data attributes
+        with the latest bar for each ticker symbol.
+        """
 
         # iterate over each symbol and check if a new bar is available. If not, then stop the backtest.
         for symbol in self.symbol_list:
@@ -78,7 +87,7 @@ class HistoricHDF5DataHandler(DataHandler):
         # when each symbol has its latest bar, emit a new MarketEvent to continue the event loop
         self.events.put(MarketEvent())
 
-    def get_latest_bars(self, symbol: str, N=1) -> List[BarType] | None:
+    def get_latest_bars(self, symbol: str, N=1) -> List[BarType]:
         """
         Docstring for get_latest_bars
 
@@ -87,15 +96,17 @@ class HistoricHDF5DataHandler(DataHandler):
         :type symbol: str
         :param N: Description
         :return: Description
-        :rtype: List[Any] | None
+        :rtype: List[BarType] | None
 
         Returns the latest N bars for the given symbol. If less than N bars are
         available, the available number of bars are returned.
         """
+
         try:
             bars_list = self.latest_symbol_data[symbol]
         except KeyError:
             print("This historical dataset does not contain this symbol.")
+            return [(f"unknown ticker: {symbol}", datetime.datetime.now(), 0.0, 0.0, 0.0, 0.0, 0)]
         else:
             return bars_list[-N:]
 
@@ -142,21 +153,21 @@ class HistoricHDF5DataHandler(DataHandler):
             self.symbol_data[ticker] = temp_data[ticker].reindex(
                 index=comb_index, method="ffill").iterrows()
 
-    # Generator[Tuple[str, datetime.datetime, *Tuple[Any, ...]]]:
     def _get_new_bar(self, symbol: str) -> Generator[BarType]:
         """
         Docstring for _get_new_bar
 
-        :param self: The DataHandler instance.
-        :param symbol: The symbol to get a bar for, e.g. 'MSFT'.
+        :param self: Description
+        :param symbol: Description
         :type symbol: str
-        :return: A bar of data for a single point in time.
-        :rtype: Generator[Any, None, None]
+        :return: Description
+        :rtype: Generator[BarType, None, None]
 
         Yields a generator containing a single bar of data for the given symbol,
-        and corresponding to a single point in time. 
+        and corresponding to a single point in time. The columns correspond to
+        'Ticker', 'Date', 'Open', 'High', 'Low',  'Close', 'Volume'.
         """
         for datum in self.symbol_data[symbol]:
             row = (symbol, datetime.datetime.strptime(
-                str(datum[0]), "%Y-%m-%d %H:%M:%S"), *datum[1])
+                str(datum[0]), "%Y-%m-%d %H:%M:%S"), datum[1][0], datum[1][1], datum[1][2], datum[1][3], datum[1][4])
             yield row

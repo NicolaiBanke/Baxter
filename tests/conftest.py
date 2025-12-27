@@ -1,15 +1,27 @@
 import pytest
 from datetime import datetime
 from queue import Queue
-from baxter.event.market import MarketEvent
+from event.market import MarketEvent
 from typing import Tuple, List
-from baxter.data.data_handler import DataHandler
+from event.event import Event
+from data.data_handler import DataHandler
+from data.data_handler import BarType
+import pandas as pd
 
+# generic batch of data
+@pytest.fixture(scope="module")
+def data() -> pd.DataFrame | pd.Series:
+    with pd.HDFStore("/home/n1c0/Dropbox/Quant/Projects/baxter/tests/test_hdf5data.h5") as store:
+        df = store.get("price_series/SPY")
+    
+    return df.head()
 
 # generic Queue object with a single MarketEvent in it
+
+
 @pytest.fixture(scope="module")
-def events_queue() -> Queue:
-    q = Queue()
+def events_queue() -> Queue[Event]:
+    q: Queue[Event] = Queue()
     q.put(MarketEvent())
     return q
 
@@ -17,23 +29,23 @@ def events_queue() -> Queue:
 
 
 @pytest.fixture(scope="module")
-def symbol_list():
+def symbol_list() -> List[str]:
     return ["SPY", "QQQ"]
 
 # arguments for a generic FillEvent object
 
 
 @pytest.fixture(scope="module")
-def fill_args():
+def fill_args() -> Tuple[str, int, str, str, float, datetime]:
     # symbol, quantity, direction, exchange, fill_cost, time_index
-    return ["symbol", 1, "BUY", "exchange", 1.0, datetime.now()]
+    return ("symbol", 1, "BUY", "exchange", 1.0, datetime.now())
 
 
 # arguments for a generic OrderEvent object
 @pytest.fixture
-def order_args():
+def order_args() -> Tuple[str, int, str, str]:
     # symbol, quantity, direction, order_type
-    return ["symbol", 1, "BUY", "MKT"]
+    return ("symbol", 1, "BUY", "MKT")
 
 
 # arguments for a generic DataHandler subobject
@@ -41,3 +53,29 @@ def order_args():
 def data_handler_args(events_queue) -> Tuple[Queue, str, List[str]]:
     # events, hdf5_dir, symbol_list
     return (events_queue, "/home/n1c0/Dropbox/Quant/Projects/baxter/tests/test_hdf5data.h5", ["SPY", "QQQ"])
+
+
+@pytest.fixture(scope="module")
+def data_handler() -> DataHandler:
+    # generic DataHandler subclass
+    class DH(DataHandler):
+        @property
+        def symbol_list(self) -> List[str]: ...
+        
+        @property
+        def continue_backtest(self) -> bool: ...
+        
+        @continue_backtest.setter
+        def continue_backtest(self, new_setting: bool) -> None: ...
+        
+        def get_latest_bars(self, symbol, N=1) -> List[BarType]: ...
+        
+        def update_bars(self) -> None: ...
+    
+    return DH()
+
+
+# create a bar fixture
+@pytest.fixture(scope="module")
+def bar(data: pd.DataFrame | pd.Series) -> BarType:
+    return ("SPY", datetime.strptime(str(data.index[0]), "%Y-%m-%d %H:%M:%S"), *data.iloc[1])

@@ -1,6 +1,7 @@
-from baxter.event.event import Event
-from baxter.event.event import EventType
+from event.event import Event
+from event.event import EventType
 from datetime import datetime
+from typing import Literal
 
 
 class FillEvent(Event):
@@ -25,10 +26,14 @@ class FillEvent(Event):
     def type(self):
         return EventType.FILL
 
-    def __init__(self, symbol: str, quantity: int, direction: str, exchange: str, fill_cost: float, time_index: datetime):
+    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], exchange: str, fill_cost: float, time_index: datetime):
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction
         self.exchange = exchange
         self.fill_cost = fill_cost
+        self.commission = 0.0  # should be able to set
         self.time_index = time_index
+
+    def _calculate_commission(self):
+        raise NotImplementedError("Should calculate the relevant commission.")

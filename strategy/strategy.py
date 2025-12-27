@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from baxter.event.market import MarketEvent
+from event.market import MarketEvent
 
 
 class Strategy(ABC):
@@ -17,8 +17,8 @@ class Strategy(ABC):
         """
         Docstring for calculate_signals
 
-        :param self: Description
-        :param event: Description
+        :param self: Strategy instance.
+        :param event: market event which triggers the calculations.
         :type event: MarketEvent
 
         Calculates the Signal Events which are sent and acted on

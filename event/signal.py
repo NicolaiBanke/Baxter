@@ -1,4 +1,4 @@
-from event import Event, EventType
+from .event import Event, EventType
 from datetime import datetime
 from enum import Enum
 
@@ -12,6 +12,7 @@ class SignalType(Enum):
 
     LONG = "Long"
     SHORT = "Short"
+    EXIT = "Exit"
 
 
 class SignalEvent(Event):
