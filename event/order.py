@@ -1,5 +1,6 @@
 from enum import Enum
 from event.event import Event, EventType
+from typing import Literal
 
 
 class OrderType(Enum):
@@ -35,7 +36,7 @@ class OrderEvent(Event):
     def type(self):
         return EventType.ORDER
 
-    def __init__(self, symbol: str, quantity: int, direction: str, order_type: OrderType):
+    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], order_type: OrderType):
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction
