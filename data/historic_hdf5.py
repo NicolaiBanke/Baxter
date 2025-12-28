@@ -3,7 +3,7 @@ from .data_handler import DataHandler, BarType
 from event.market import MarketEvent
 from typing import List, Iterator, Dict, Hashable, Generator
 import pandas as pd
-import numpy as np
+import logging
 from pathlib import Path
 import datetime
 
@@ -91,11 +91,11 @@ class HistoricHDF5DataHandler(DataHandler):
         """
         Docstring for get_latest_bars
 
-        :param self: Description
-        :param symbol: Description
+        :param self: HistoricHDF5DataHandler instance
+        :param symbol: ticker symbol
         :type symbol: str
-        :param N: Description
-        :return: Description
+        :param N: number of bars to get
+        :return: list of N bars
         :rtype: List[BarType] | None
 
         Returns the latest N bars for the given symbol. If less than N bars are
