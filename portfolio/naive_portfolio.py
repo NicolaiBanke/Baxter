@@ -26,13 +26,13 @@ class NaivePortfolio(Portfolio):
         """
         Docstring for __init__
 
-        :param self: Description
-        :param bars: Description
+        :param self: NaivePortfolio instance
+        :param bars: DataHandler instance
         :type bars: DataHandler
-        :param events: Description
+        :param events: the events queue
         :type events: Queue
-        :param initial_capital: Description
-        :param start_date: Description
+        :param initial_capital: the starting amount of capital
+        :param start_date: the starting date of the portfolio
         """
 
         self.bars = bars

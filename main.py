@@ -1,7 +1,12 @@
 from queue import Queue, Empty
-from event.event import Event, EventType
+from event.event import Event
+from event.market import MarketEvent
 from data.data_handler import DataHandler
 from data.historic_hdf5 import HistoricHDF5DataHandler
+from strategy.buynhold import BuyAndHoldStrategy
+from strategy.strategy import Strategy
+from portfolio.naive_portfolio import NaivePortfolio
+from execution.simulated import SimulatedExecutionHandler
 
 data_path = "/home/n1c0/Dropbox/Quant/Projects/baxter/tests"
 symbols = ["SPY", "QQQ"]
@@ -10,9 +15,9 @@ events: Queue[Event] = Queue()
 
 bars: DataHandler = HistoricHDF5DataHandler(
     events, data_path + "/test_hdf5data.h5", symbols)
-# strategy: Strategy = Strategy()
-# port = Portfolio()
-# broker = ExecutionHandler()
+strategy: Strategy = BuyAndHoldStrategy(bars=bars, events=events)
+pf = NaivePortfolio(events=events, bars=bars)
+broker = SimulatedExecutionHandler(events=events)
 
 
 # the loop representing market events
@@ -29,9 +34,9 @@ def main():
                 break
             else:
                 if event is not None:
-                    if event.type == EventType.MKT:
-                        # strategy.calculate_signals(event)
-                        # # port.update_timeindex(event)
+                    if isinstance(event, MarketEvent): #event.type == EventType.MKT:
+                        strategy.calculate_signals(event)
+                        pf.update_timeindex(event)
                         bars.continue_backtest = False
 
 
