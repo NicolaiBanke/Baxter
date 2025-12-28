@@ -26,7 +26,7 @@ class FillEvent(Event):
     def type(self):
         return EventType.FILL
 
-    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], exchange: str, fill_cost: float, time_index: datetime):
+    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], exchange: str, fill_cost: float | None, time_index: datetime):
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction

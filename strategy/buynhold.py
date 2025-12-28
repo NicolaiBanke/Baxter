@@ -29,7 +29,7 @@ class BuyAndHoldStrategy(Strategy):
     def _calculate_initial_bought(self) -> dict[str, bool]:
         bought = {}
         for symbol in self.symbol_list:
-            self.bought[symbol] = False
+            bought[symbol] = False
         return bought
 
     def calculate_signals(self, event: MarketEvent) -> None:

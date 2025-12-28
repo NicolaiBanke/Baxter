@@ -157,10 +157,10 @@ class HistoricHDF5DataHandler(DataHandler):
         """
         Docstring for _get_new_bar
 
-        :param self: Description
-        :param symbol: Description
+        :param self: HistoricHDF5DataHandler instance
+        :param symbol: the relevant ticker symbol
         :type symbol: str
-        :return: Description
+        :return: a row of OHLCV data of the form with a time stamp and ticker symbol
         :rtype: Generator[BarType, None, None]
 
         Yields a generator containing a single bar of data for the given symbol,
@@ -169,5 +169,5 @@ class HistoricHDF5DataHandler(DataHandler):
         """
         for datum in self.symbol_data[symbol]:
             row = (symbol, datetime.datetime.strptime(
-                str(datum[0]), "%Y-%m-%d %H:%M:%S"), datum[1][0], datum[1][1], datum[1][2], datum[1][3], datum[1][4])
+                str(datum[0]), "%Y-%m-%d %H:%M:%S"), datum[1].iloc[0], datum[1].iloc[1], datum[1].iloc[2], datum[1].iloc[3], datum[1].iloc[4])
             yield row
