@@ -1,15 +1,15 @@
-from event.fill import FillEvent
-from event.signal import SignalEvent
+from baxter.event.fill import FillEvent
+from baxter.event.signal import SignalEvent
 from .portfolio import Portfolio
 from datetime import datetime
 from typing import List, Dict, Union
 from queue import Queue
-from data.data_handler import DataHandler, BarType
+from baxter.data.data_handler import DataHandler, BarType
 import pandas as pd
-from event.market import MarketEvent
-from event.event import EventType
-from event.signal import SignalType
-from event.order import OrderEvent, OrderType
+from baxter.event.market import MarketEvent
+from baxter.event.event import EventType
+from baxter.event.signal import SignalType
+from baxter.event.order import OrderEvent, OrderType
 
 
 class NaivePortfolio(Portfolio):

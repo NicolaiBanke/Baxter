@@ -3,21 +3,25 @@ name = "baxter"
 version = "0.1.0"
 description = "An event-driven backtester for quantitative trading strategies."
 readme = "README.md"
+authors = [
+    { name = "Nicolai Banke", email = "nicolaibanke@hotmail.com" }
+]
 requires-python = ">=3.13"
 dependencies = [
-    "pandas>=2.3.3",
+    "pandas>=3.0.0",
     "tables>=3.10.2",
 ]
 
+[project.scripts]
+baxter = "baxter.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
 [dependency-groups]
 dev = [
+    "hypothesis>=6.150.2",
     "pytest>=9.0.2",
     "pytest-mock>=3.15.1",
-    "ruff>=0.14.10",
 ]
-
-[tool.ruff.lint]
-extend-select = ["B"]
-
-[tool.pytest.ini_options]
-pythonpath = ["."]

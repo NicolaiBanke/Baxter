@@ -1,5 +1,5 @@
 from enum import Enum
-from event.event import Event, EventType
+from baxter.event.event import Event, EventType
 from typing import Literal
 
 

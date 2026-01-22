@@ -1,15 +1,15 @@
 from queue import Queue, Empty
-from event.event import Event
-from event.signal import SignalEvent
-from event.market import MarketEvent
-from event.order import OrderEvent
-from event.fill import FillEvent
-from data.data_handler import DataHandler
-from data.historic_hdf5 import HistoricHDF5DataHandler
-from strategy.buynhold import BuyAndHoldStrategy
-from strategy.strategy import Strategy
-from portfolio.naive_portfolio import NaivePortfolio
-from execution.simulated import SimulatedExecutionHandler
+from baxter.event.event import Event
+from baxter.event.signal import SignalEvent
+from baxter.event.market import MarketEvent
+from baxter.event.order import OrderEvent
+from baxter.event.fill import FillEvent
+from baxter.data.data_handler import DataHandler
+from baxter.data.historic_hdf5 import HistoricHDF5DataHandler
+from baxter.strategy.buynhold import BuyAndHoldStrategy
+from baxter.strategy.strategy import Strategy
+from baxter.portfolio.naive_portfolio import NaivePortfolio
+from baxter.execution.simulated import SimulatedExecutionHandler
 import logging
 import time
 
@@ -46,11 +46,9 @@ def main():
                 break
             else:
                 if event is not None:
-                    # if event.type == EventType.MKT:
                     if isinstance(event, MarketEvent):
                         strategy.calculate_signals(event)
                         pf.update_timeindex(event)
-                        #bars.continue_backtest = False
                     elif isinstance(event, SignalEvent):
                         pf.update_signal(event)
                     elif isinstance(event, OrderEvent):

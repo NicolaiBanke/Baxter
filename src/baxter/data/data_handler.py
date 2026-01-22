@@ -1,7 +1,6 @@
 from abc import abstractmethod, ABC
 from typing import List, Tuple
 from datetime import datetime
-import numpy as np
 
 type BarType = Tuple[str, datetime, float, float, float, float, float]
 

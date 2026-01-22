@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from event.order import OrderEvent
+from baxter.event.order import OrderEvent
 
 
 class ExecutionHandler(ABC):
