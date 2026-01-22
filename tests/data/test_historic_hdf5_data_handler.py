@@ -1,8 +1,8 @@
 import pytest
 from inspect import isgenerator
-from data.historic_hdf5 import HistoricHDF5DataHandler
+from baxter.data.historic_hdf5 import HistoricHDF5DataHandler
 from queue import Queue
-from event.event import Event
+from baxter.event.event import Event
 from typing import Tuple, List
 
 # testing private method, maybe delete

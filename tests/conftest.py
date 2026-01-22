@@ -1,11 +1,11 @@
 import pytest
 from datetime import datetime
 from queue import Queue
-from event.market import MarketEvent
+from baxter.event.market import MarketEvent
 from typing import Tuple, List
-from event.event import Event
-from data.data_handler import DataHandler
-from data.data_handler import BarType
+from baxter.event.event import Event
+from baxter.data.data_handler import DataHandler
+from baxter.data.data_handler import BarType
 import pandas as pd
 
 # generic batch of data
