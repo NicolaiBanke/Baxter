@@ -1,8 +1,8 @@
-from event.event import EventType
-from event.market import MarketEvent
-from event.signal import SignalEvent, SignalType
-from strategy.strategy import Strategy
-from data.data_handler import DataHandler
+from baxter.event.event import EventType
+from baxter.event.market import MarketEvent
+from baxter.event.signal import SignalEvent, SignalType
+from baxter.strategy.strategy import Strategy
+from baxter.data.data_handler import DataHandler
 from queue import Queue
 
 
@@ -33,6 +33,13 @@ class BuyAndHoldStrategy(Strategy):
         return bought
 
     def calculate_signals(self, event: MarketEvent) -> None:
+        """
+        Docstring for calculate_signals
+        
+        :param self: the BuyAndHoldStrategy instance
+        :param event: the event being responded to
+        :type event: MarketEvent
+        """
         if event.type == EventType.MKT:
             # go through each ticker and get the N=1 latest bars
             for ticker in self.symbol_list:

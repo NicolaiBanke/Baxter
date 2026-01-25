@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from event.market import MarketEvent
+from baxter.event.market import MarketEvent
 
 
 class Strategy(ABC):

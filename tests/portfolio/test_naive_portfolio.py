@@ -1,11 +1,11 @@
-from portfolio.naive_portfolio import NaivePortfolio
+from baxter.portfolio.naive_portfolio import NaivePortfolio
 from queue import Queue
-from event.event import Event
-from data.data_handler import DataHandler
+from baxter.event.event import Event
+from baxter.data.data_handler import DataHandler
 from pytest_mock import MockerFixture
 from queue import Queue
-from event.market import MarketEvent
-from data.data_handler import BarType
+from baxter.event.market import MarketEvent
+from baxter.data.data_handler import BarType
 from typing import List
 
 # .update_timeindex should only append current holdings and positions to corresponding properties
