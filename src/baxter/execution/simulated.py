@@ -5,7 +5,27 @@ from baxter.event.event import EventType
 from baxter.event.fill import FillEvent
 import datetime
 from typing import cast, Literal
+import logging
+import sys
 
+# logging config
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+stdoutHandler = logging.StreamHandler(stream=sys.stdout)
+stdoutHandler.setLevel(logging.DEBUG)
+
+errHandler = logging.FileHandler("error.log")
+errHandler.setLevel(logging.ERROR)
+
+fmt = logging.Formatter(
+    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+
+stdoutHandler.setFormatter(fmt)
+errHandler.setFormatter(fmt)
+
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 class SimulatedExecutionHandler(ExecutionHandler):
     def __init__(self, events: Queue) -> None:
@@ -31,3 +51,4 @@ class SimulatedExecutionHandler(ExecutionHandler):
             )
 
             self.events.put(fill_event)
+            logger.info(f"Sent fill event: {fill_event}")

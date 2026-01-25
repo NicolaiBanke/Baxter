@@ -9,13 +9,30 @@ from baxter.data.historic_hdf5 import HistoricHDF5DataHandler
 from baxter.strategy.buynhold import BuyAndHoldStrategy
 from baxter.strategy.strategy import Strategy
 from baxter.portfolio.naive_portfolio import NaivePortfolio
+from baxter.portfolio.portfolio import Portfolio
 from baxter.execution.simulated import SimulatedExecutionHandler
 import logging
 import time
+import sys
 
 # logging config
-logging.basicConfig(level=logging.INFO,
-                    format="{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+stdoutHandler = logging.StreamHandler(stream=sys.stdout)
+stdoutHandler.setLevel(logging.DEBUG)
+
+errHandler = logging.FileHandler("error.log")
+errHandler.setLevel(logging.ERROR)
+
+fmt = logging.Formatter(
+    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+
+stdoutHandler.setFormatter(fmt)
+errHandler.setFormatter(fmt)
+
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 data_path = "/home/n1c0/Dropbox/Quant/Projects/baxter/tests"
 symbols = ["SPY", "QQQ"]
@@ -25,27 +42,27 @@ events: Queue[Event] = Queue()
 bars: DataHandler = HistoricHDF5DataHandler(
     events, data_path + "/test_hdf5data.h5", symbols)
 strategy: Strategy = BuyAndHoldStrategy(bars=bars, events=events)
-pf = NaivePortfolio(events=events, bars=bars)
+pf: Portfolio = NaivePortfolio(events=events, bars=bars)
 broker = SimulatedExecutionHandler(events=events)
 
 
 # the loop representing market events
 
 def main():
-    logging.info("Event loop starts")
     while bars.continue_backtest:
+        logger.info("Updating bars...")
         bars.update_bars()
 
         # handle the incoming events one by one
         while True:
             try:
                 event = events.get(False)
-                logging.info(f"Event: {event.type}")
             except Empty:
-                logging.info("Event queue is empty.")
+                logger.info("Waiting to update bars...")
                 break
             else:
                 if event is not None:
+                    logger.info(f"Event: {event.type}")
                     if isinstance(event, MarketEvent):
                         strategy.calculate_signals(event)
                         pf.update_timeindex(event)
@@ -58,9 +75,5 @@ def main():
                     else:
                         continue
                 else:
-                    logging.error("Event is None.")
-        time.sleep(.1)
-
-
-if __name__ == "__main__":
-    main()
+                    logger.error(f"Event is {None}.")
+        time.sleep(600)
