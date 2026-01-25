@@ -10,7 +10,27 @@ from baxter.event.market import MarketEvent
 from baxter.event.event import EventType
 from baxter.event.signal import SignalType
 from baxter.event.order import OrderEvent, OrderType
+import logging
+import sys
 
+# logging config
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+stdoutHandler = logging.StreamHandler(stream=sys.stdout)
+stdoutHandler.setLevel(logging.DEBUG)
+
+errHandler = logging.FileHandler("error.log")
+errHandler.setLevel(logging.ERROR)
+
+fmt = logging.Formatter(
+    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+
+stdoutHandler.setFormatter(fmt)
+errHandler.setFormatter(fmt)
+
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 class NaivePortfolio(Portfolio):
     """
