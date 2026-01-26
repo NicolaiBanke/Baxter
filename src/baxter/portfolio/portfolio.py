@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from baxter.event.signal import SignalEvent
 from baxter.event.fill import FillEvent
+from baxter.event.market import MarketEvent
 
 
 class Portfolio(ABC):
@@ -18,4 +19,8 @@ class Portfolio(ABC):
 
     @abstractmethod
     def update_fill(self, fill_event: FillEvent) -> None:
-        raise NotImplementedError("Shoul implement .update_fill")
+        raise NotImplementedError("Should implement .update_fill")
+    
+    @abstractmethod
+    def update_timeindex(self, event: MarketEvent) -> None:
+        raise NotImplementedError("Should implement .update_timeindex")

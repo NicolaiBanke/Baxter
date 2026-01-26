@@ -11,9 +11,13 @@ from baxter.strategy.strategy import Strategy
 from baxter.portfolio.naive_portfolio import NaivePortfolio
 from baxter.portfolio.portfolio import Portfolio
 from baxter.execution.simulated import SimulatedExecutionHandler
+from baxter.backtest import Backtest
 import logging
-import time
+import quantstats as qs
 import sys
+
+# extend pandas functionality with metrics, etc.
+qs.extend_pandas()
 
 # logging config
 logger = logging.getLogger(__name__)
@@ -41,8 +45,11 @@ events: Queue[Event] = Queue()
 
 bars: DataHandler = HistoricHDF5DataHandler(
     events, data_path + "/test_hdf5data.h5", symbols)
-strategy: Strategy = BuyAndHoldStrategy(bars=bars, events=events)
-pf: Portfolio = NaivePortfolio(events=events, bars=bars)
+
+# It should be possible to define a strategy in a Jupyter notebook or separate file, and pass it here
+strategy: Strategy = Backtest.strategy if Backtest.strategy is not None else BuyAndHoldStrategy(bars=bars, events=events)
+
+pf = NaivePortfolio(events=events, bars=bars)
 broker = SimulatedExecutionHandler(events=events)
 
 
@@ -50,7 +57,6 @@ broker = SimulatedExecutionHandler(events=events)
 
 def main():
     while bars.continue_backtest:
-        logger.info("Updating bars...")
         bars.update_bars()
 
         # handle the incoming events one by one
@@ -58,11 +64,9 @@ def main():
             try:
                 event = events.get(False)
             except Empty:
-                logger.info("Waiting to update bars...")
                 break
             else:
                 if event is not None:
-                    logger.info(f"Event: {event.type}")
                     if isinstance(event, MarketEvent):
                         strategy.calculate_signals(event)
                         pf.update_timeindex(event)
@@ -75,5 +79,5 @@ def main():
                     else:
                         continue
                 else:
-                    logger.error(f"Event is {None}.")
-        time.sleep(600)
+                    logger.error(f"Event is {None}: {event}")
+                    continue

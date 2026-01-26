@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "pandas>=3.0.0",
+    "quantstats>=0.0.81",
     "tables>=3.10.2",
 ]
 
