@@ -9,12 +9,11 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "pandas>=3.0.0",
-    "quantstats>=0.0.81",
     "tables>=3.10.2",
 ]
 
 [project.scripts]
-baxter = "baxter.__main__:main"
+baxter = "baxter.main:run"
 
 [build-system]
 requires = ["uv_build>=0.9.18,<0.10.0"]
