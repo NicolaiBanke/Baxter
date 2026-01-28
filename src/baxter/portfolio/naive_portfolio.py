@@ -11,13 +11,27 @@ from baxter.event.event import EventType
 from baxter.event.signal import SignalType
 from baxter.event.order import OrderEvent, OrderType
 import logging
-from tools.logging_conf import *
+import sys
 
-# logging config
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+# logging config
+stdoutHandler = logging.StreamHandler(stream=sys.stdout)
+stdoutHandler.setLevel(logging.DEBUG)
+
+errHandler = logging.FileHandler("error.log")
+errHandler.setLevel(logging.ERROR)
+
 logger.addHandler(stdoutHandler)
 logger.addHandler(errHandler)
+
+fmt = logging.Formatter(
+    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+
+stdoutHandler.setFormatter(fmt)
+errHandler.setFormatter(fmt)
+
 
 class NaivePortfolio(Portfolio):
     """

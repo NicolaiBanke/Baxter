@@ -13,7 +13,7 @@ class Strategy(ABC):
     """
 
     @abstractmethod
-    def calculate_signals(self, event: MarketEvent):
+    def calculate_signals(self, event: MarketEvent) -> None:
         """
         Docstring for calculate_signals
 
