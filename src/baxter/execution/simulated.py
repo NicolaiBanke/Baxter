@@ -1,7 +1,7 @@
 from baxter.event.order import OrderEvent
 from .execution_handler import ExecutionHandler
 from queue import Queue
-from baxter.event.event import EventType
+from baxter.event import Event, EventType
 from baxter.event.fill import FillEvent
 import datetime
 from typing import cast, Literal
@@ -28,7 +28,7 @@ logger.addHandler(stdoutHandler)
 logger.addHandler(errHandler)
 
 class SimulatedExecutionHandler(ExecutionHandler):
-    def __init__(self, events: Queue) -> None:
+    def __init__(self, events: Queue[Event]) -> None:
         """
         Docstring for __init__
 

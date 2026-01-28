@@ -1,4 +1,4 @@
-from .event import Event
+from .event import Event, EventType
 from .fill import FillEvent
 from .market import MarketEvent
 from .order import OrderEvent
@@ -9,5 +9,6 @@ __all__ = [
     "FillEvent",
     "MarketEvent",
     "OrderEvent",
-    "SignalEvent"
+    "SignalEvent",
+    "EventType"
 ]
