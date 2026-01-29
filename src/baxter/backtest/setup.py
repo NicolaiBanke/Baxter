@@ -5,6 +5,7 @@ from baxter.event import Event, MarketEvent
 from baxter.strategy import Strategy, BuyAndHoldStrategy
 from baxter.portfolio import Portfolio, NaivePortfolio
 from baxter.execution import ExecutionHandler, SimulatedExecutionHandler
+from datetime import datetime
 
 # this should probably be an .env variable
 DATA_PATH: str = "/home/n1c0/Dropbox/Quant/Projects/baxter/tests"
@@ -37,7 +38,8 @@ def initialize_algorithm(
         events, DATA_PATH + "/test_hdf5data.h5", symbols)
 
     # portfolio and execution handler can also be defaults for now
-    pf: Portfolio = NaivePortfolio(events=events, bars=bars)
+    pf: Portfolio = NaivePortfolio(
+        events=events, bars=bars, start_date=datetime(1999, 3, 9))
     broker: ExecutionHandler = SimulatedExecutionHandler(events=events)
 
     return events, bars, strategy(bars, events), pf, broker
