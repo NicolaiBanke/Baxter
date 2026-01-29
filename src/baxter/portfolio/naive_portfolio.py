@@ -43,7 +43,7 @@ class NaivePortfolio(Portfolio):
     portfolio.
     """
 
-    def __init__(self, bars: DataHandler, events: Queue, initial_capital=100_000.0, start_date=datetime.now()) -> None:
+    def __init__(self, bars: DataHandler, events: Queue, initial_capital=100_000.0, start_date=None) -> None:
         """
         Docstring for __init__
 
@@ -60,7 +60,7 @@ class NaivePortfolio(Portfolio):
         self.symbol_list = self.bars.symbol_list
         self.events = events
         self.initial_capital = initial_capital
-        self.start_date = start_date
+        self.start_date = datetime.now() if not start_date else start_date
 
         self._all_positions = self._construct_all_positions()
         self._current_positions = {s: 0 for s in self.bars.symbol_list}
