@@ -18,8 +18,8 @@ class FillEvent(Event):
     - quantity: the amount of assets in the order
     - direction: 'BUY' or 'SELL'
     - exchange: the exchange on which the order is being filled
-    - fill_cost: the cost of the fill? <-- brush up
-    - time_index: the timestamp of the fill?  <-- brush up
+    - fill_cost: the cost of the fill
+    - time_index: the timestamp of the fill
     """
 
     @property
@@ -34,6 +34,9 @@ class FillEvent(Event):
         self.fill_cost = fill_cost
         self.commission = 0.0  # should be able to set
         self.time_index = time_index
+    
+    def __repr__(self) -> str:
+        return f"{self.direction} {self.quantity} shares of {self.symbol} on {self.exchange} at {self.time_index}"
 
     def _calculate_commission(self):
         raise NotImplementedError("Should calculate the relevant commission.")

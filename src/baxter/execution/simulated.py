@@ -19,13 +19,14 @@ errHandler = logging.FileHandler("error.log")
 errHandler.setLevel(logging.ERROR)
 
 fmt = logging.Formatter(
-    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
+    "{levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
 
 stdoutHandler.setFormatter(fmt)
 errHandler.setFormatter(fmt)
 
 logger.addHandler(stdoutHandler)
 logger.addHandler(errHandler)
+
 
 class SimulatedExecutionHandler(ExecutionHandler):
     def __init__(self, events: Queue[Event]) -> None:
@@ -41,6 +42,7 @@ class SimulatedExecutionHandler(ExecutionHandler):
 
     def execute_order(self, event: OrderEvent) -> None:
         if event.type == EventType.ORDER:
+            logger.info(f"Received order: {event}")
             fill_event = FillEvent(
                 direction=cast(Literal["BUY", "SELL"], event.direction),
                 exchange="ARCA",
@@ -51,4 +53,3 @@ class SimulatedExecutionHandler(ExecutionHandler):
             )
 
             self.events.put(fill_event)
-            logger.info(f"Sent fill event: {fill_event}")

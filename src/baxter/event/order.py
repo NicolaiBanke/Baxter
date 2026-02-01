@@ -41,3 +41,6 @@ class OrderEvent(Event):
         self.quantity = quantity
         self.direction = direction
         self.order_type = order_type
+
+    def __repr__(self) -> str:
+        return f"Order sent: {self.direction} {self.quantity} shares of {self.symbol} - order type: {self.order_type}"
