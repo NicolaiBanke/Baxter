@@ -4,6 +4,7 @@ from baxter.event.market import MarketEvent
 from baxter.event.order import OrderEvent
 from baxter.event.fill import FillEvent
 from baxter.backtest.setup import initialize_algorithm, InitAlgo
+from baxter.portfolio import Portfolio
 from typing import Callable
 
 
@@ -13,7 +14,7 @@ symbols: list[str] = ["SPY", "QQQ"]
 # It should be possible to define a strategy in a Jupyter notebook or separate file, and pass it here
 
 
-def run_algorithm(initialize_algorithm: Callable[[], InitAlgo] = initialize_algorithm):
+def run_algorithm(initialize_algorithm: Callable[[], InitAlgo] = initialize_algorithm) -> Portfolio:
     events, bars, strategy, pf, broker = initialize_algorithm()
 
     while bars.continue_backtest:
@@ -40,5 +41,5 @@ def run_algorithm(initialize_algorithm: Callable[[], InitAlgo] = initialize_algo
                         continue
                 else:
                     continue
-
-    # analyze()
+    pf.create_equity_curve_dataframe()
+    return pf

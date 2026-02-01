@@ -20,7 +20,12 @@ class Portfolio(ABC):
     @abstractmethod
     def update_fill(self, fill_event: FillEvent) -> None:
         raise NotImplementedError("Should implement .update_fill")
-    
+
     @abstractmethod
     def update_timeindex(self, event: MarketEvent) -> None:
         raise NotImplementedError("Should implement .update_timeindex")
+
+    @abstractmethod
+    def create_equity_curve_dataframe(self) -> None:
+        raise NotImplementedError(
+            "Should implement .create_equity_curve_dataframe")

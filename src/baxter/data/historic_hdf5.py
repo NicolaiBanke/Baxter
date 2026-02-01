@@ -25,7 +25,7 @@ class HistoricHDF5DataHandler(DataHandler):
     DataHandler for handling historic .h5 files.
     """
 
-    def __init__(self, events: Queue, hdf5_dir: str, symbol_list: List[str]) -> None:
+    def __init__(self, events: Queue, hdf5_dir: Path, symbol_list: List[str]) -> None:
         """
         Docstring for __init__
 
