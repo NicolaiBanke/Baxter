@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 from typing import List, Tuple
 from datetime import datetime
 
+# 'Ticker', 'Date', 'Open', 'High', 'Low',  'Close', 'Volume'
 type BarType = Tuple[str, datetime, float, float, float, float, float]
 
 

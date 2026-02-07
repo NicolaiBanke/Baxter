@@ -10,27 +10,6 @@ from baxter.event.market import MarketEvent
 from baxter.event.event import EventType
 from baxter.event.signal import SignalType
 from baxter.event.order import OrderEvent, OrderType
-import logging
-import sys
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# logging config
-stdoutHandler = logging.StreamHandler(stream=sys.stdout)
-stdoutHandler.setLevel(logging.DEBUG)
-
-errHandler = logging.FileHandler("error.log")
-errHandler.setLevel(logging.ERROR)
-
-logger.addHandler(stdoutHandler)
-logger.addHandler(errHandler)
-
-fmt = logging.Formatter(
-    "{asctime} - {levelname}:{name}:{message}", style="{", datefmt="%Y-%m-%d %H:%M")
-
-stdoutHandler.setFormatter(fmt)
-errHandler.setFormatter(fmt)
 
 
 class NaivePortfolio(Portfolio):
@@ -299,7 +278,6 @@ class NaivePortfolio(Portfolio):
         Responds to the SignalEvent by generating a naive order, and puts
         the resulting OrderEvent on the events queue.
         """
-
         if signal_event.type == EventType.SIGNAL:
             order_event = self._generate_naive_order(signal_event)
             self.events.put(order_event)

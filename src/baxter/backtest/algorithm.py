@@ -2,12 +2,19 @@ from queue import Empty
 from ..event import SignalEvent, MarketEvent, OrderEvent, FillEvent
 from ..backtest.initialization import initialize_algorithm, CalcSignal
 from ..portfolio import Portfolio
+import logging
+from tools import errHandler, stdoutHandler
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 
 def run_algorithm(symbols: list[str],
-                  calculate_signals: CalcSignal, windows: dict[str, int]) -> Portfolio:
+                  calculate_signals: CalcSignal, N: int) -> Portfolio:
     events, bars, strategy, pf, broker = initialize_algorithm(
-        symbols=symbols, calculate_signals=calculate_signals, windows=windows)
+        symbols=symbols, calculate_signals=calculate_signals, N=N)
 
     while bars.continue_backtest:
         bars.update_bars()
@@ -26,6 +33,7 @@ def run_algorithm(symbols: list[str],
                     elif isinstance(event, SignalEvent):
                         pf.update_signal(event)
                     elif isinstance(event, OrderEvent):
+                        logger.info(f"Order sent")
                         broker.execute_order(event)
                     elif isinstance(event, FillEvent):
                         pf.update_fill(event)

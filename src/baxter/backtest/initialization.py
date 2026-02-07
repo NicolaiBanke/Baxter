@@ -24,7 +24,7 @@ type InitAlgo = tuple[Queue[Event], DataHandler,
 
 def initialize_algorithm(
         symbols: list[str],
-        calculate_signals: CalcSignal, windows: dict[str, int]) -> InitAlgo:
+        calculate_signals: CalcSignal, N: int) -> InitAlgo:
 
     events: Queue[Event] = Queue()
     # for now, use HistoricHDF5DataHandler as default data handler
@@ -36,6 +36,6 @@ def initialize_algorithm(
         events=events, bars=bars, start_date=datetime(1999, 3, 9))
     broker: ExecutionHandler = SimulatedExecutionHandler(events=events)
 
-    strategy = strategy_factory(calculate_signals, windows=windows)(bars, events)
+    strategy = strategy_factory(N)(calculate_signals)(bars, events)
 
     return events, bars, strategy, pf, broker
