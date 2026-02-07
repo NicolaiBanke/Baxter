@@ -264,6 +264,7 @@ class NaivePortfolio(Portfolio):
         receiving a FillEvent.
         """
         if fill_event.type == EventType.FILL:
+            logger.info(f"Received fill event: {fill_event}")
             self._update_positions_from_fill(fill_event)
             self._update_holdings_from_fill(fill_event)
 
