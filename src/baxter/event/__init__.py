@@ -2,7 +2,7 @@ from .event import Event, EventType
 from .fill import FillEvent
 from .market import MarketEvent
 from .order import OrderEvent
-from .signal import SignalEvent
+from .signal import SignalEvent, SignalType
 
 __all__ = [
     "Event",
@@ -10,5 +10,6 @@ __all__ = [
     "MarketEvent",
     "OrderEvent",
     "SignalEvent",
+    "SignalType",
     "EventType"
 ]

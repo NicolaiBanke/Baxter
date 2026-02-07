@@ -1,21 +1,20 @@
 from queue import Empty
-from baxter.event.signal import SignalEvent
-from baxter.event.market import MarketEvent
-from baxter.event.order import OrderEvent
-from baxter.event.fill import FillEvent
-from baxter.backtest.setup import initialize_algorithm, InitAlgo
-from baxter.portfolio import Portfolio
-from typing import Callable
+from ..event import SignalEvent, MarketEvent, OrderEvent, FillEvent
+from ..backtest.initialization import initialize_algorithm, CalcSignal
+from ..portfolio import Portfolio
+import logging
+from tools import errHandler, stdoutHandler
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 
-symbols: list[str] = ["SPY", "QQQ"]
-
-
-# It should be possible to define a strategy in a Jupyter notebook or separate file, and pass it here
-
-
-def run_algorithm(initialize_algorithm: Callable[[], InitAlgo] = initialize_algorithm) -> Portfolio:
-    events, bars, strategy, pf, broker = initialize_algorithm()
+def run_algorithm(symbols: list[str],
+                  calculate_signals: CalcSignal, N: int) -> Portfolio:
+    events, bars, strategy, pf, broker = initialize_algorithm(
+        symbols=symbols, calculate_signals=calculate_signals, N=N)
 
     while bars.continue_backtest:
         bars.update_bars()
@@ -34,6 +33,7 @@ def run_algorithm(initialize_algorithm: Callable[[], InitAlgo] = initialize_algo
                     elif isinstance(event, SignalEvent):
                         pf.update_signal(event)
                     elif isinstance(event, OrderEvent):
+                        logger.info(f"Order sent")
                         broker.execute_order(event)
                     elif isinstance(event, FillEvent):
                         pf.update_fill(event)

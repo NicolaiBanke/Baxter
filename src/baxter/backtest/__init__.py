@@ -1,7 +1,8 @@
 from baxter.backtest.algorithm import run_algorithm
-from baxter.backtest.analyze import analyze
+from baxter.backtest.initialization import initialize_algorithm, strategy_factory
 
 __all__ = [
     "run_algorithm",
-    "analyze"
+    "initialize_algorithm",
+    "strategy_factory"
 ]
