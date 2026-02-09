@@ -22,7 +22,7 @@ def strategy_factory(N: int) -> Callable[[CalcSignal], InitStrategy]:
                     # go through each ticker and get the N=1 latest bars
                     for ticker in self.symbol_list:
                         bars = self.bars.get_latest_bars(ticker, N=N)
-                        if bars is not None and bars != []:
+                        if bars is not None and len(bars) >= N: # != []:
                             signal_type = _calculate_signals(bars)
                             if signal_type is not None:
                                 signal = SignalEvent(
