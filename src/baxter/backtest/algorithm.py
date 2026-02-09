@@ -2,13 +2,6 @@ from queue import Empty
 from ..event import SignalEvent, MarketEvent, OrderEvent, FillEvent
 from ..backtest.initialization import initialize_algorithm, CalcSignal
 from ..portfolio import Portfolio
-import logging
-from tools import errHandler, stdoutHandler
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.addHandler(stdoutHandler)
-logger.addHandler(errHandler)
 
 
 def run_algorithm(symbols: list[str],
@@ -33,7 +26,6 @@ def run_algorithm(symbols: list[str],
                     elif isinstance(event, SignalEvent):
                         pf.update_signal(event)
                     elif isinstance(event, OrderEvent):
-                        logger.info(f"Order sent")
                         broker.execute_order(event)
                     elif isinstance(event, FillEvent):
                         pf.update_fill(event)
