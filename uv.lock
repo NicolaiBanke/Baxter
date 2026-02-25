@@ -16,6 +16,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "pandas" },
+    { name = "saxo-openapi" },
     { name = "tables" },
 ]
 
@@ -29,6 +30,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pandas", specifier = ">=3.0.0" },
+    { name = "saxo-openapi", specifier = ">=0.6.0" },
     { name = "tables", specifier = ">=3.10.2" },
 ]
 
@@ -470,6 +472,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c9/74/b3ff8e6c8446842c3f5c837e9c3dfcfe2018ea6ecef224c710c85ef728f4/requests-2.32.5.tar.gz", hash = "sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf", size = 134517, upload-time = "2025-08-18T20:46:02.573Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/db/4254e3eabe8020b458f1a747140d32277ec7a271daf1d235b70dc0b4e6e3/requests-2.32.5-py3-none-any.whl", hash = "sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6", size = 64738, upload-time = "2025-08-18T20:46:00.542Z" },
+]
+
+[[package]]
+name = "saxo-openapi"
+version = "0.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/fc/689a3a0899a04464e48a67d11cc3130234605170d52bfd4ede289de68630/saxo_openapi-0.6.0.tar.gz", hash = "sha256:88d16ecae4f11885a68f7064bb1addb6dc1ece19c3e09c21609527783c458636", size = 72439, upload-time = "2019-09-16T15:45:05.33Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/9a/2182948a822b484b8f0fc458d690878d30c2866f1fd4ae5d409ea7e3716f/saxo_openapi-0.6.0-py2.py3-none-any.whl", hash = "sha256:03857bb81c5f8e77c8f679de233f1edb7dbb4f585d2c253350b5ba4e74211119", size = 123371, upload-time = "2019-09-16T15:45:02.622Z" },
 ]
 
 [[package]]
