@@ -8,6 +8,8 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "aiohttp>=3.13.3",
+    "asyncio>=4.0.0",
     "pandas>=3.0.0",
     "saxo-openapi>=0.6.0",
     "tables>=3.10.2",
