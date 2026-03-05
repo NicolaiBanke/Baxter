@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from baxter.event.order import OrderEvent
+from aiohttp import ClientSession
+from typing import Union
 
 
 class ExecutionHandler(ABC):
@@ -19,4 +21,10 @@ class ExecutionHandler(ABC):
         :param event: the event to respond to, in this case an OrderEvent
         :type event: OrderEvent
         """
+        raise NotImplementedError("Should implement .execute_order")
+
+
+class AsyncExecutionHandler(ABC):
+    @abstractmethod
+    def execute_order(self, event: OrderEvent, session: ClientSession):
         raise NotImplementedError("Should implement .execute_order")

@@ -1,17 +1,21 @@
-from baxter.event.order import OrderEvent, OrderType
-from .execution_handler import ExecutionHandler
+from baxter.event.order import OrderEvent
+from baxter.execution.execution_handler import AsyncExecutionHandler
 from queue import Queue
 from baxter.event import Event, EventType
 from baxter.event.fill import FillEvent
 import datetime
-from typing import cast, Literal, TypedDict
-from saxo_openapi import OpenAPIError, API
-import saxo_openapi.endpoints.trading as tr
-from saxo_openapi.contrib.session import account_info
-from saxo_openapi.contrib.util import InstrumentToUic
+from typing import cast, Literal, TypedDict, Union
 import os
 import aiohttp
 import asyncio
+import logging
+from tools.logging_conf import errHandler, stdoutHandler
+import json
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+logger.addHandler(stdoutHandler)
+logger.addHandler(errHandler)
 
 # there aren't separate execution handlers for sim and live saxo accounts, as these will be distinquished by the API token, I think
 
@@ -26,16 +30,13 @@ class SaxoOrder(TypedDict):
     ManualOrder: bool
 
 
-class SaxoExecutionHandler(ExecutionHandler):
+class SaxoExecutionHandler(AsyncExecutionHandler):
 
     def __init__(self, events: Queue[Event]) -> None:
 
         self.events = events
 
         self._set_saxo_api()
-
-        # self.client = aiohttp.ClientSession(
-        #    base_url=self.base_url, headers=self.headers)
 
         self.acct_key = asyncio.run(self._get_acct_key())
 
@@ -49,13 +50,13 @@ class SaxoExecutionHandler(ExecutionHandler):
         self.base_url = 'https://gateway.saxobank.com/sim/'
 
     async def _get_acct_key(self):
-        async with aiohttp.ClientSession(
-                base_url=self.base_url, headers=self.headers) as session:
+        async with aiohttp.ClientSession(base_url=self.base_url, headers=self.headers) as session:
             async with session.get('openapi/port/v1/accounts/me') as response:
-                return await response.json()
+                res = await response.json()
 
-    def _create_saxo_order(self, order: OrderEvent) -> SaxoOrder:
+        return res['Data'][0]['AccountKey']
 
+    async def _create_saxo_order(self, order: OrderEvent, session: aiohttp.ClientSession) -> SaxoOrder:
         spec = {
             "Instrument": order.symbol,
             "Amount": order.quantity,
@@ -64,10 +65,17 @@ class SaxoExecutionHandler(ExecutionHandler):
             "ManualOrder": True
         }
 
-        spec_with_uic = InstrumentToUic(
-            client=self.client, AccountKey=acct_key, spec=spec, assettype="Stock")
+        async with session.get(url=f"openapi/ref/v1/instruments?AssetTypes=Stock&Keywords={spec.get("Instrument", "")}") as response:
+            res = await response.json()
+        
+        if len(res['Data']) == 1:
+            del spec['Instrument']
+            spec.update({'Uic': res['Data'][0]['Identifier']})
+        else:
+            raise ValueError("Got multiple instruments for: {}".format(
+                             spec['Instrument']))
 
-        return SaxoOrder(AccountKey=acct_key, AssetType="Stock", **spec_with_uic)
+        return SaxoOrder(AccountKey=self.acct_key, AssetType="Stock", **spec)
 
     # should possibly be public method
     def _create_fill(self, event: FillEvent):
@@ -84,8 +92,10 @@ class SaxoExecutionHandler(ExecutionHandler):
         self.events.put(fill_event)
         raise NotImplementedError
 
-    def execute_order(self, event: OrderEvent) -> None:
+    async def execute_order(self, event: OrderEvent, session: aiohttp.ClientSession) -> Union[aiohttp.ClientResponse, None]:
         if event.type == EventType.ORDER:
-            order = self._create_saxo_order(event)
-            order = tr.orders.Order(data=order)
-            self.client.request(order)
+            saxo_order = await self._create_saxo_order(event, session=session)
+            data = json.dumps(saxo_order)
+            async with session.post('openapi/trade/v2/orders', headers=self.headers, data=data) as response:
+                #not sure if I want to return a Response object, which can be checked for status, or an await'ed .json object
+                return response
