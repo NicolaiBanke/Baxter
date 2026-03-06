@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from baxter.event.order import OrderEvent
 from aiohttp import ClientSession
-from typing import Union
 
 
 class ExecutionHandler(ABC):

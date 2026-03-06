@@ -1,10 +1,10 @@
-from baxter.event.order import OrderEvent
+from baxter.event.order import OrderEvent, OrderType
 from baxter.execution.execution_handler import AsyncExecutionHandler
 from queue import Queue
-from baxter.event import Event, EventType
+from baxter.event import Event
 from baxter.event.fill import FillEvent
 import datetime
-from typing import cast, Literal, TypedDict, Union
+from typing import cast, Literal, TypedDict
 import os
 import aiohttp
 import asyncio
@@ -67,7 +67,7 @@ class SaxoExecutionHandler(AsyncExecutionHandler):
 
         async with session.get(url=f"openapi/ref/v1/instruments?AssetTypes=Stock&Keywords={spec.get("Instrument", "")}") as response:
             res = await response.json()
-        
+
         if len(res['Data']) == 1:
             del spec['Instrument']
             spec.update({'Uic': res['Data'][0]['Identifier']})
@@ -92,10 +92,31 @@ class SaxoExecutionHandler(AsyncExecutionHandler):
         self.events.put(fill_event)
         raise NotImplementedError
 
-    async def execute_order(self, event: OrderEvent, session: aiohttp.ClientSession) -> Union[aiohttp.ClientResponse, None]:
-        if event.type == EventType.ORDER:
-            saxo_order = await self._create_saxo_order(event, session=session)
-            data = json.dumps(saxo_order)
-            async with session.post('openapi/trade/v2/orders', headers=self.headers, data=data) as response:
-                #not sure if I want to return a Response object, which can be checked for status, or an await'ed .json object
-                return response
+    async def execute_order(self, event: OrderEvent, session: aiohttp.ClientSession) -> aiohttp.ClientResponse:
+        # if event.type == EventType.ORDER: <-- this gets in the way of type checking for a client response
+        saxo_order = await self._create_saxo_order(event, session=session)
+        data = json.dumps(saxo_order)
+        async with session.post('openapi/trade/v2/orders', headers=self.headers, data=data) as response:
+            # not sure if I want to return a Response object, which can be checked for status, or an await'ed .json object
+            return response
+
+
+if __name__ == "__main__":
+    order = OrderEvent(
+        direction='BUY',
+        order_type=OrderType['MKT'],
+        quantity=10,
+        symbol="NOVOb"
+    )
+
+    queue = Queue()
+    queue.put(order)
+
+    saxo = SaxoExecutionHandler(events=queue)
+
+    async def main():
+        async with aiohttp.ClientSession(base_url=saxo.base_url, headers=saxo.headers) as session:
+            return await saxo.execute_order(event=order, session=session)
+
+    res = asyncio.run(main())
+    print("res:", res.status)

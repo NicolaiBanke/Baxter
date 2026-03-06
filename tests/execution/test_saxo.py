@@ -1,6 +1,9 @@
-from baxter.execution.saxo import SaxoExecutionHandler
+import aiohttp
+import pytest
 
-def test_execute_order(events_queue, mkt_order):
-    saxo_eh = SaxoExecutionHandler(events=events_queue)
-    saxo_eh.execute_order(event=mkt_order)
-    assert saxo_eh.response == 200
+
+@pytest.mark.asyncio
+async def test_execute_order(saxo_execution_handler, mkt_order):
+    async with aiohttp.ClientSession(base_url=saxo_execution_handler.base_url, headers=saxo_execution_handler.headers) as session:
+        res = await saxo_execution_handler.execute_order(mkt_order, session=session)
+    assert res.status == 200
