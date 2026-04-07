@@ -22,7 +22,13 @@ class NaivePortfolio(Portfolio):
     portfolio.
     """
 
-    def __init__(self, bars: DataHandler, events: Queue, initial_capital=100_000.0, start_date=None) -> None:
+    def __init__(
+        self,
+        bars: DataHandler,
+        events: Queue,
+        initial_capital=100_000.0,
+        start_date=None,
+    ) -> None:
         """
         Docstring for __init__
 
@@ -84,10 +90,8 @@ class NaivePortfolio(Portfolio):
         set to self.start_date to note the starting date of the portfolio.
         """
 
-        d: Dict[str, Union[int, datetime]] = {
-            s: 0 for s in self.symbol_list
-        }
-        d['datetime'] = self.start_date
+        d: Dict[str, Union[int, datetime]] = {s: 0 for s in self.symbol_list}
+        d["datetime"] = self.start_date
 
         return [d]
 
@@ -104,13 +108,11 @@ class NaivePortfolio(Portfolio):
         The total amount of money is also given in the 'total' entry.
         """
 
-        d: Dict[str, Union[int, datetime, float]] = {
-            s: 0 for s in self.symbol_list
-        }
-        d['datetime'] = self.start_date
-        d['cash'] = self.initial_capital
-        d['commission'] = 0.0
-        d['total'] = self.initial_capital
+        d: Dict[str, Union[int, datetime, float]] = {s: 0 for s in self.symbol_list}
+        d["datetime"] = self.start_date
+        d["cash"] = self.initial_capital
+        d["commission"] = 0.0
+        d["total"] = self.initial_capital
 
         return [d]
 
@@ -125,12 +127,10 @@ class NaivePortfolio(Portfolio):
 
         """
 
-        d: Dict[str, Union[int, float]] = {
-            s: 0 for s in self.symbol_list
-        }
-        d['cash'] = self.initial_capital
-        d['commission'] = 0.0
-        d['total'] = self.initial_capital
+        d: Dict[str, Union[int, float]] = {s: 0 for s in self.symbol_list}
+        d["cash"] = self.initial_capital
+        d["commission"] = 0.0
+        d["total"] = self.initial_capital
 
         return d
 
@@ -147,8 +147,7 @@ class NaivePortfolio(Portfolio):
         fill_dir = 1 if fill_event.direction == "BUY" else -1
 
         # update the positions
-        self.current_positions[fill_event.symbol] += fill_dir * \
-            fill_event.quantity
+        self.current_positions[fill_event.symbol] += fill_dir * fill_event.quantity
 
     def _update_holdings_from_fill(self, fill_event: FillEvent) -> None:
         """
@@ -195,29 +194,45 @@ class NaivePortfolio(Portfolio):
 
         # if signal direction is long and there are currently no shares of the given ticker
         if direction == SignalType.LONG and cur_quantity == 0:
-            order = OrderEvent(symbol=symbol, direction="BUY",
-                               order_type=order_type, quantity=mkt_quantity)
+            order = OrderEvent(
+                symbol=symbol,
+                direction="BUY",
+                order_type=order_type,
+                quantity=mkt_quantity,
+            )
         # if signal direction is short and there are currently no shares of the given ticker
         elif direction == SignalType.SHORT and cur_quantity == 0:
-            order = OrderEvent(symbol=symbol, direction="SELL",
-                               order_type=order_type, quantity=mkt_quantity)
+            order = OrderEvent(
+                symbol=symbol,
+                direction="SELL",
+                order_type=order_type,
+                quantity=mkt_quantity,
+            )
 
         # if signal direction is exit and we are currently long shares of the given ticker
         elif direction == SignalType.EXIT and cur_quantity > 0:
-            order = OrderEvent(symbol=symbol, direction="SELL",
-                               order_type=order_type, quantity=mkt_quantity)
+            order = OrderEvent(
+                symbol=symbol,
+                direction="SELL",
+                order_type=order_type,
+                quantity=mkt_quantity,
+            )
         # if signal direction is short and we are currently short shares of the given ticker
         elif direction == SignalType.SHORT and cur_quantity < 0:
-            order = OrderEvent(symbol=symbol, direction="BUY",
-                               order_type=order_type, quantity=abs(mkt_quantity))
+            order = OrderEvent(
+                symbol=symbol,
+                direction="BUY",
+                order_type=order_type,
+                quantity=abs(mkt_quantity),
+            )
 
         return order
 
     def create_equity_curve_dataframe(self) -> None:
         curve = pd.DataFrame(self.all_holdings)
-        curve.set_index('datetime', inplace=True)
-        curve['returns'] = curve['total'].pct_change()
-        curve['equity_curve'] = (1.0 + curve['returns']).cumprod()
+        curve.set_index("datetime", inplace=True)
+        curve["returns"] = curve["total"].pct_change()
+        curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
         self.equity_curve = curve
 
     def update_timeindex(self, event: MarketEvent) -> None:
@@ -236,19 +251,17 @@ class NaivePortfolio(Portfolio):
             bars[ticker] = self.bars.get_latest_bars(ticker)
 
         # get and append current positions
-        dp = {**self.current_positions,
-              'datetime': bars[self.symbol_list[0]][0][1]}
+        dp = {**self.current_positions, "datetime": bars[self.symbol_list[0]][0][1]}
         self.all_positions.append(dp)
 
         # get and append current holdings
-        dh = {**self.current_holdings,
-              'datetime': bars[self.symbol_list[0]][0][1]}
+        dh = {**self.current_holdings, "datetime": bars[self.symbol_list[0]][0][1]}
 
         for ticker in self.symbol_list:
             # approximate the market value using the volume
             market_value = self.current_positions[ticker] * bars[ticker][0][5]
             dh[ticker] = market_value
-            dh['total'] += market_value
+            dh["total"] += market_value
 
         self.all_holdings.append(dh)
 

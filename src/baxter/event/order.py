@@ -12,6 +12,7 @@ class OrderType(Enum):
     MKT = 'Market order'
     LIM = 'Limit order'
     """
+
     MKT = "Market order"
     LIM = "Limit order"
 
@@ -36,7 +37,13 @@ class OrderEvent(Event):
     def type(self):
         return EventType.ORDER
 
-    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], order_type: OrderType):
+    def __init__(
+        self,
+        symbol: str,
+        quantity: int,
+        direction: Literal["BUY", "SELL"],
+        order_type: OrderType,
+    ):
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction

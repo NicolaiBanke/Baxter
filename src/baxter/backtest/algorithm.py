@@ -1,13 +1,16 @@
+from typing import Iterable
 from queue import Empty
 from ..event import SignalEvent, MarketEvent, OrderEvent, FillEvent
 from ..backtest.initialization import initialize_algorithm, CalcSignal
 from ..portfolio import Portfolio
 
 
-def run_algorithm(symbols: list[str],
-                  calculate_signals: CalcSignal, N: int) -> Portfolio:
+def run_algorithm(
+    symbols: Iterable[str], calculate_signals: CalcSignal, N: int
+) -> Portfolio:
     events, bars, strategy, pf, broker = initialize_algorithm(
-        symbols=symbols, calculate_signals=calculate_signals, N=N)
+        symbols=symbols, calculate_signals=calculate_signals, N=N
+    )
 
     while bars.continue_backtest:
         bars.update_bars()

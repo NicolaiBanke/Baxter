@@ -1,9 +1,9 @@
+from baxter.event import Event
 from queue import Queue
 from .data_handler import DataHandler, BarType
 from baxter.event.market import MarketEvent
-from typing import List, Iterator, Dict, Hashable, Generator
+from typing import List, Iterator, Dict, Hashable, Generator, Mapping, Iterable
 import pandas as pd
-import logging
 from pathlib import Path
 import datetime
 
@@ -19,13 +19,15 @@ class HistoricHDF5DataHandler(DataHandler):
 
     Additional attributes:
     symbol_data: a dict with symbol as keys and corresponding data as values.
-    latest_symbol_data: 
+    latest_symbol_data:
     continue_backtest: bool to signal whether to keep backtesting or not.
 
     DataHandler for handling historic .h5 files.
     """
 
-    def __init__(self, events: Queue, hdf5_dir: Path, symbol_list: List[str]) -> None:
+    def __init__(
+        self, events: Queue[Event], hdf5_dir: Path, symbol_list: Iterable[str]
+    ) -> None:
         """
         Docstring for __init__
 
@@ -42,15 +44,14 @@ class HistoricHDF5DataHandler(DataHandler):
         self.hdf5_dir = Path(hdf5_dir)
         self._symbol_list = symbol_list
 
-        self.symbol_data: Dict[str,
-                               Iterator[tuple[Hashable, pd.Series[float]]]] = {}
+        self.symbol_data: Mapping[str, Iterator[tuple[Hashable, pd.Series[float]]]] = {}
         self.latest_symbol_data: Dict[str, List[BarType]] = {}
         self._continue_backtest = True
 
         self._open_convert_hdf5_files()
 
     @property
-    def symbol_list(self):
+    def symbol_list(self) -> Iterable[str]:
         return self._symbol_list
 
     @property
@@ -60,7 +61,7 @@ class HistoricHDF5DataHandler(DataHandler):
     @continue_backtest.setter
     def continue_backtest(self, new_setting: bool) -> None:
         if isinstance(new_setting, bool):
-            self._continue_backtest = new_setting
+            self._continue_backtest: bool = new_setting
         else:
             return TypeError("continue_backtest must be a boolean.")
 
@@ -77,7 +78,7 @@ class HistoricHDF5DataHandler(DataHandler):
         # iterate over each symbol and check if a new bar is available. If not, then stop the backtest.
         for symbol in self.symbol_list:
             try:
-                bar = next(self._get_new_bar(symbol))
+                bar: BarType = next(self._get_new_bar(symbol))
             except StopIteration:
                 self.continue_backtest = False
             else:
@@ -103,10 +104,20 @@ class HistoricHDF5DataHandler(DataHandler):
         """
 
         try:
-            bars_list = self.latest_symbol_data[symbol]
+            bars_list: list[BarType] = self.latest_symbol_data[symbol]
         except KeyError:
             print("This historical dataset does not contain this symbol.")
-            return [(f"unknown ticker: {symbol}", datetime.datetime.now(), 0.0, 0.0, 0.0, 0.0, 0)]
+            return [
+                (
+                    f"unknown ticker: {symbol}",
+                    datetime.datetime.now(),
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0,
+                )
+            ]
         else:
             return bars_list[-N:]
 
@@ -122,12 +133,12 @@ class HistoricHDF5DataHandler(DataHandler):
         """
 
         # comb_index is the eventual combination of all indices of the pd.DataFrames
-        comb_index = None
+        comb_index: pd.DatetimeIndex | None = None
         # for each symbol, create a dict entry with a pd.DataFrame of data
         temp_data: Dict[str, pd.DataFrame | pd.Series] = {}
         for ticker in self.symbol_list:
             with pd.HDFStore(self.hdf5_dir) as store:
-                data = store.get(f"price_series/{ticker}")
+                data: pd.DataFrame = store.get(f"price_series/{ticker}")
             data.sort_index(inplace=True)
 
             # check if comb_index has been set yet, and set it if it hasn't, otherwise combine it with the already defined comb_index
@@ -145,13 +156,15 @@ class HistoricHDF5DataHandler(DataHandler):
         # next, reindex and pad the data series on the combined index comb_index, as well as calculating returns
         for ticker in self.symbol_list:
             temp_data[ticker].reindex(index=comb_index, method="ffill")
-            temp_data[ticker]["returns"] = temp_data[ticker]["Close"].pct_change(
-            ).dropna()
+            temp_data[ticker]["returns"] = (
+                temp_data[ticker]["Close"].pct_change().dropna()
+            )
 
         # compensate for the dropped row from the .dropna above by reindexing on comb_index, and make the dataframes into generators with .iterrows
         for ticker in self.symbol_list:
-            self.symbol_data[ticker] = temp_data[ticker].reindex(
-                index=comb_index, method="ffill").iterrows()
+            self.symbol_data[ticker] = (
+                temp_data[ticker].reindex(index=comb_index, method="ffill").iterrows()
+            )
 
     def _get_new_bar(self, symbol: str) -> Generator[BarType]:
         """
@@ -168,6 +181,13 @@ class HistoricHDF5DataHandler(DataHandler):
         'Ticker', 'Date', 'Open', 'High', 'Low',  'Close', 'Volume'.
         """
         for datum in self.symbol_data[symbol]:
-            row = (symbol, datetime.datetime.strptime(
-                str(datum[0]), "%Y-%m-%d %H:%M:%S"), datum[1].iloc[0], datum[1].iloc[1], datum[1].iloc[2], datum[1].iloc[3], datum[1].iloc[4])
+            row = (
+                symbol,
+                datetime.datetime.strptime(str(datum[0]), "%Y-%m-%d %H:%M:%S"),
+                datum[1].iloc[0],
+                datum[1].iloc[1],
+                datum[1].iloc[2],
+                datum[1].iloc[3],
+                datum[1].iloc[4],
+            )
             yield row

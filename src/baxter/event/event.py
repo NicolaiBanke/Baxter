@@ -22,6 +22,7 @@ class Event(ABC):
     The base class for the Event objects. It serves only as an interface
     for derived classes and holds no functionality itself.
     """
+
     @property
     @abstractmethod
     def type(self) -> EventType: ...

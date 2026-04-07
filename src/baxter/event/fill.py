@@ -26,7 +26,15 @@ class FillEvent(Event):
     def type(self):
         return EventType.FILL
 
-    def __init__(self, symbol: str, quantity: int, direction: Literal["BUY", "SELL"], exchange: str, fill_cost: float | None, time_index: datetime):
+    def __init__(
+        self,
+        symbol: str,
+        quantity: int,
+        direction: Literal["BUY", "SELL"],
+        exchange: str,
+        fill_cost: float | None,
+        time_index: datetime,
+    ):
         self.symbol = symbol
         self.quantity = quantity
         self.direction = direction
@@ -34,7 +42,7 @@ class FillEvent(Event):
         self.fill_cost = fill_cost
         self.commission = 0.0  # should be able to set
         self.time_index = time_index
-    
+
     def __repr__(self) -> str:
         return f"{self.direction} {self.quantity} shares of {self.symbol} on {self.exchange} at {self.time_index}"
 

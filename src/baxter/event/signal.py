@@ -20,10 +20,12 @@ class SignalEvent(Event):
     def type(self):
         return EventType.SIGNAL
 
-    def __init__(self, symbol: str, datetime: datetime, signal_type: SignalType) -> None:
+    def __init__(
+        self, symbol: str, datetime: datetime, signal_type: SignalType
+    ) -> None:
         """
         Docstring for __init__
-        
+
         :param self: Description
         :param symbol: Description
         :type symbol: str
@@ -32,7 +34,7 @@ class SignalEvent(Event):
         :param signal_type: Description
         :type signal_type: SignalType
         """
-        
+
         self.symbol = symbol
         self.datetime = datetime
         self.signal_type = signal_type

@@ -27,7 +27,7 @@ class SimulatedExecutionHandler(ExecutionHandler):
                 fill_cost=None,
                 quantity=event.quantity,
                 symbol=event.symbol,
-                time_index=datetime.datetime.now(datetime.timezone.utc)
+                time_index=datetime.datetime.now(datetime.timezone.utc),
             )
 
             self.events.put(fill_event)

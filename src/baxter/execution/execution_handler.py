@@ -11,6 +11,7 @@ class ExecutionHandler(ABC):
     must implement a method to execute an order, and can be
     used to simulate the process of interacting with a brokerage.
     """
+
     @abstractmethod
     def execute_order(self, event: OrderEvent):
         """
