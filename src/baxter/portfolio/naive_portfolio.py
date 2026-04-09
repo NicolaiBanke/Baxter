@@ -1,8 +1,9 @@
+from baxter.event import Event
 from baxter.event.fill import FillEvent
 from baxter.event.signal import SignalEvent
 from .portfolio import Portfolio
 from datetime import datetime
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Literal
 from queue import Queue
 from baxter.data.data_handler import DataHandler, BarType
 import pandas as pd
@@ -25,9 +26,9 @@ class NaivePortfolio(Portfolio):
     def __init__(
         self,
         bars: DataHandler,
-        events: Queue,
-        initial_capital=100_000.0,
-        start_date=None,
+        events: Queue[Event],
+        initial_capital: float = 100_000.0,
+        start_date: pd.Timestamp | None = None,
     ) -> None:
         """
         Docstring for __init__
@@ -44,13 +45,13 @@ class NaivePortfolio(Portfolio):
         self.bars = bars
         self.symbol_list = self.bars.symbol_list
         self.events = events
-        self.initial_capital = initial_capital
+        self.initial_capital: float = initial_capital
         self.start_date = datetime.now() if not start_date else start_date
 
         self._all_positions = self._construct_all_positions()
         self._current_positions = {s: 0 for s in self.bars.symbol_list}
         self._all_holdings = self._construct_all_holdings()
-        self._current_holdings = self._construct_current_holdings()
+        self._current_holdings: dict[str, float] = self._construct_current_holdings()
 
         self._equity_curve = None
 
@@ -63,7 +64,7 @@ class NaivePortfolio(Portfolio):
         return self._current_positions
 
     @property
-    def all_holdings(self) -> List[Dict[str, Union[str, datetime, float]]]:
+    def all_holdings(self) -> List[Dict[str, Union[datetime, float]]]:
         return self._all_holdings
 
     @property
@@ -116,7 +117,7 @@ class NaivePortfolio(Portfolio):
 
         return [d]
 
-    def _construct_current_holdings(self) -> Dict[str, Union[int, float]]:
+    def _construct_current_holdings(self) -> Dict[str, float]:
         """
         Docstring for _construct_current_holdings
 
@@ -127,7 +128,10 @@ class NaivePortfolio(Portfolio):
 
         """
 
-        d: Dict[str, Union[int, float]] = {s: 0 for s in self.symbol_list}
+        d: Dict[
+            Literal["cash"] | Literal["commission"] | Literal["total"] | str,
+            Union[int, float],
+        ] = {s: 0 for s in self.symbol_list}
         d["cash"] = self.initial_capital
         d["commission"] = 0.0
         d["total"] = self.initial_capital
@@ -144,7 +148,7 @@ class NaivePortfolio(Portfolio):
         """
 
         # check the direction of the FillEvent: can only be 'BUY' or 'SELL'
-        fill_dir = 1 if fill_event.direction == "BUY" else -1
+        fill_dir: Literal[1, -1] = 1 if fill_event.direction == "BUY" else -1
 
         # update the positions
         self.current_positions[fill_event.symbol] += fill_dir * fill_event.quantity
@@ -259,9 +263,9 @@ class NaivePortfolio(Portfolio):
 
         for ticker in self.symbol_list:
             # approximate the market value using the volume
-            market_value = self.current_positions[ticker] * bars[ticker][0][5]
+            market_value: float = self.current_positions[ticker] * bars[ticker][0][5]
             dh[ticker] = market_value
-            dh["total"] += market_value
+            dh["total"] += market_value  # ty: ignore
 
         self.all_holdings.append(dh)
 
@@ -293,4 +297,5 @@ class NaivePortfolio(Portfolio):
         """
         if signal_event.type == EventType.SIGNAL:
             order_event = self._generate_naive_order(signal_event)
-            self.events.put(order_event)
+            if order_event is not None:
+                self.events.put(order_event)

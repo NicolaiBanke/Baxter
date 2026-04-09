@@ -5,10 +5,10 @@ from baxter.event import Event
 from baxter.strategy import Strategy
 from baxter.portfolio import Portfolio, NaivePortfolio
 from baxter.execution import ExecutionHandler, SimulatedExecutionHandler
-from datetime import datetime
 from pathlib import Path
 from ..factories import strategy_factory, CalcSignal
 import os
+import pandas as pd
 
 try:
     baxter_root = os.environ["BAXTER_ROOT"]
@@ -32,7 +32,7 @@ def initialize_algorithm(
 
     # portfolio and execution handler can also be defaults for now
     pf: Portfolio = NaivePortfolio(
-        events=events, bars=bars, start_date=datetime(1999, 3, 9)
+        events=events, bars=bars, start_date=pd.Timestamp(1999, 3, 9)
     )
     broker: ExecutionHandler = SimulatedExecutionHandler(events=events)
 

@@ -1,4 +1,4 @@
-from baxter.event.order import OrderEvent, OrderType
+from baxter.event.order import OrderEvent
 from baxter.execution.execution_handler import AsyncExecutionHandler
 from queue import Queue
 from baxter.event import Event
@@ -81,7 +81,15 @@ class SaxoExecutionHandler(AsyncExecutionHandler):
                 "Got multiple instruments for: {}".format(spec["Instrument"])
             )
 
-        return SaxoOrder(AccountKey=self.acct_key, AssetType="Stock", **spec)
+        saxo_order_args: dict[str, str | int] = {
+            "AccountKey": self.acct_key,
+            "AssetType": "Stock",
+            **spec,
+        }
+
+        saxo_order: SaxoOrder = {**saxo_order_args}
+
+        return saxo_order
 
     # should possibly be public method
     def _create_fill(self, event: FillEvent):
@@ -109,23 +117,3 @@ class SaxoExecutionHandler(AsyncExecutionHandler):
         ) as response:
             # not sure if I want to return a Response object, which can be checked for status, or an await'ed .json object
             return response
-
-
-if __name__ == "__main__":
-    order = OrderEvent(
-        direction="BUY", order_type=OrderType["MKT"], quantity=10, symbol="NOVOb"
-    )
-
-    queue = Queue()
-    queue.put(order)
-
-    saxo = SaxoExecutionHandler(events=queue)
-
-    async def main():
-        async with aiohttp.ClientSession(
-            base_url=saxo.base_url, headers=saxo.headers
-        ) as session:
-            return await saxo.execute_order(event=order, session=session)
-
-    res = asyncio.run(main())
-    print("res:", res.status)

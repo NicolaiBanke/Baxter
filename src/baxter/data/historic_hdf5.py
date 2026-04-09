@@ -2,10 +2,11 @@ from baxter.event import Event
 from queue import Queue
 from .data_handler import DataHandler, BarType
 from baxter.event.market import MarketEvent
-from typing import List, Iterator, Dict, Hashable, Generator, Mapping, Iterable
+from typing import List, Iterator, Dict, Hashable, Generator, Iterable
 import pandas as pd
 from pathlib import Path
 import datetime
+from data_validation import get_validated_data
 
 
 class HistoricHDF5DataHandler(DataHandler):
@@ -44,7 +45,7 @@ class HistoricHDF5DataHandler(DataHandler):
         self.hdf5_dir = Path(hdf5_dir)
         self._symbol_list = symbol_list
 
-        self.symbol_data: Mapping[str, Iterator[tuple[Hashable, pd.Series[float]]]] = {}
+        self.symbol_data: dict[str, Iterator[tuple[Hashable, pd.Series[float]]]] = {}
         self.latest_symbol_data: Dict[str, List[BarType]] = {}
         self._continue_backtest = True
 
@@ -135,10 +136,11 @@ class HistoricHDF5DataHandler(DataHandler):
         # comb_index is the eventual combination of all indices of the pd.DataFrames
         comb_index: pd.DatetimeIndex | None = None
         # for each symbol, create a dict entry with a pd.DataFrame of data
-        temp_data: Dict[str, pd.DataFrame | pd.Series] = {}
+        temp_data: Dict[str, pd.DataFrame] = {}  # pd.DataFrame | pd.Series
         for ticker in self.symbol_list:
-            with pd.HDFStore(self.hdf5_dir) as store:
-                data: pd.DataFrame = store.get(f"price_series/{ticker}")
+            data: pd.DataFrame = get_validated_data(
+                hdf5_dir=self.hdf5_dir, ticker=ticker
+            )
             data.sort_index(inplace=True)
 
             # check if comb_index has been set yet, and set it if it hasn't, otherwise combine it with the already defined comb_index

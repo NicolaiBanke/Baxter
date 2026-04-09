@@ -23,12 +23,20 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "hypothesis>=6.150.2",
+    "pandera[mypy]>=0.30.1",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
     "ruff>=0.15.9",
     "ty>=0.0.29",
 ]
 
-
 [tool.ruff.format]
 skip-magic-trailing-comma = false
+
+[tool.mypy]
+plugins = "pandera.mypy"
+
+[[tool.ty.overrides]]
+include=["src/baxter/execution/saxo.py", "src/baxter/main.py"]
+[tool.ty.overrides.rules]
+missing-typed-dict-key = "ignore"
