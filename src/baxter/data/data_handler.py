@@ -1,9 +1,9 @@
 from abc import abstractmethod, ABC
-from typing import List, Tuple
-from datetime import datetime
+from typing import List, Tuple, TypeAlias
+import pandas as pd
 
 # 'Ticker', 'Date', 'Open', 'High', 'Low',  'Close', 'Volume'
-type BarType = Tuple[str, datetime, float, float, float, float, float]
+BarType: TypeAlias = Tuple[str, pd.Timestamp, float, float, float, float, float]
 
 
 class DataHandler(ABC):

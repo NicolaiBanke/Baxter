@@ -27,5 +27,4 @@ class Portfolio(ABC):
 
     @abstractmethod
     def create_equity_curve_dataframe(self) -> None:
-        raise NotImplementedError(
-            "Should implement .create_equity_curve_dataframe")
+        raise NotImplementedError("Should implement .create_equity_curve_dataframe")

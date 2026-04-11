@@ -1,3 +1,4 @@
+from baxter.event import Event
 from baxter.event.event import EventType
 from baxter.event.market import MarketEvent
 from baxter.event.signal import SignalEvent, SignalType
@@ -7,7 +8,7 @@ from queue import Queue
 
 
 class BuyAndHoldStrategy(Strategy):
-    def __init__(self, bars: DataHandler, events: Queue) -> None:
+    def __init__(self, bars: DataHandler, events: Queue[Event]) -> None:
         """
         Docstring for __init__
 
@@ -27,7 +28,7 @@ class BuyAndHoldStrategy(Strategy):
         self.bought: dict[str, bool] = self._calculate_initial_bought()
 
     def _calculate_initial_bought(self) -> dict[str, bool]:
-        bought = {}
+        bought: dict[str, bool] = {}
         for symbol in self.symbol_list:
             bought[symbol] = False
         return bought
@@ -35,7 +36,7 @@ class BuyAndHoldStrategy(Strategy):
     def calculate_signals(self, event: MarketEvent) -> None:
         """
         Docstring for calculate_signals
-        
+
         :param self: the BuyAndHoldStrategy instance
         :param event: the event being responded to
         :type event: MarketEvent
@@ -48,8 +49,7 @@ class BuyAndHoldStrategy(Strategy):
                     # buy if not bought already
                     if not self.bought[ticker]:
                         # generate a SignalEvent with signature (symbol, datetime, type = LONG, SHORT, EXIT)
-                        signal = SignalEvent(
-                            bars[0][0], bars[0][1], SignalType.LONG)
+                        signal = SignalEvent(bars[0][0], bars[0][1], SignalType.LONG)
                         # put the signal in the events queue
                         self.events.put(signal)
                         # note the ticker as bought - maybe a method could set this when a FillEvent is received confirming the trade?
