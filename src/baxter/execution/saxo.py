@@ -4,13 +4,14 @@ from queue import Queue
 from baxter.event import Event
 from baxter.event.fill import FillEvent
 import datetime
-from typing import cast, Literal, TypedDict
+from typing import Literal, TypedDict
 import os
 import aiohttp
 import asyncio
 import logging
 from tools.logging_conf import errHandler, stdoutHandler
 import json
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -95,12 +96,12 @@ class SaxoExecutionHandler(AsyncExecutionHandler):
     def _create_fill(self, event: FillEvent):
         # should put fill event on queue when .execute_order gets confirmation that the order went through
         fill_event = FillEvent(
-            direction=cast(Literal["BUY", "SELL"], event.direction),
+            direction=event.direction,
             exchange="ARCA",
             fill_cost=None,
             quantity=event.quantity,
             symbol=event.symbol,
-            time_index=datetime.datetime.now(datetime.timezone.utc),
+            time_index=pd.Timestamp.now(datetime.timezone.utc),
         )
 
         self.events.put(fill_event)

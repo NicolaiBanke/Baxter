@@ -1,9 +1,9 @@
+from ty_extensions import Unknown
 from baxter.event import Event
 from baxter.event.fill import FillEvent
 from baxter.event.signal import SignalEvent
 from .portfolio import Portfolio
-from datetime import datetime
-from typing import List, Dict, Union, Literal
+from typing import List, Dict, Union, Literal, cast
 from queue import Queue
 from baxter.data.data_handler import DataHandler, BarType
 import pandas as pd
@@ -29,6 +29,7 @@ class NaivePortfolio(Portfolio):
         events: Queue[Event],
         initial_capital: float = 100_000.0,
         start_date: pd.Timestamp | None = None,
+        end_date: pd.Timestamp = pd.Timestamp.now(),
     ) -> None:
         """
         Docstring for __init__
@@ -42,21 +43,28 @@ class NaivePortfolio(Portfolio):
         :param start_date: the starting date of the portfolio
         """
 
-        self.bars = bars
-        self.symbol_list = self.bars.symbol_list
-        self.events = events
+        self.bars: DataHandler = bars
+        self.symbol_list: list[str] = self.bars.symbol_list
+        self.events: Queue[Event] = events
         self.initial_capital: float = initial_capital
-        self.start_date = datetime.now() if not start_date else start_date
+        self.start_date: pd.Timestamp = (
+            pd.Timestamp.now() if not start_date else start_date
+        )
+        self.end_date: pd.Timestamp = end_date
 
-        self._all_positions = self._construct_all_positions()
-        self._current_positions = {s: 0 for s in self.bars.symbol_list}
-        self._all_holdings = self._construct_all_holdings()
+        self._all_positions: list[dict[str, int | pd.Timestamp]] = (
+            self._construct_all_positions()
+        )
+        self._current_positions: dict[str, int] = {s: 0 for s in self.bars.symbol_list}
+        self._all_holdings: list[dict[str, int | pd.Timestamp | float]] = (
+            self._construct_all_holdings()
+        )
         self._current_holdings: dict[str, float] = self._construct_current_holdings()
 
-        self._equity_curve = None
+        self._equity_curve: pd.DataFrame | None = None
 
     @property
-    def all_positions(self) -> List[Dict[str, Union[int, datetime]]]:
+    def all_positions(self) -> List[Dict[str, Union[int, pd.Timestamp]]]:
         return self._all_positions
 
     @property
@@ -64,7 +72,7 @@ class NaivePortfolio(Portfolio):
         return self._current_positions
 
     @property
-    def all_holdings(self) -> List[Dict[str, Union[datetime, float]]]:
+    def all_holdings(self) -> List[Dict[str, Union[pd.Timestamp, float]]]:
         return self._all_holdings
 
     @property
@@ -77,9 +85,9 @@ class NaivePortfolio(Portfolio):
 
     @equity_curve.setter
     def equity_curve(self, new_curve: pd.DataFrame) -> None:
-        self._equity_curve = new_curve
+        self._equity_curve: pd.DataFrame = new_curve
 
-    def _construct_all_positions(self) -> List[Dict[str, Union[int, datetime]]]:
+    def _construct_all_positions(self) -> List[Dict[str, Union[int, pd.Timestamp]]]:
         """
         Docstring for _construct_all_positions
 
@@ -91,12 +99,14 @@ class NaivePortfolio(Portfolio):
         set to self.start_date to note the starting date of the portfolio.
         """
 
-        d: Dict[str, Union[int, datetime]] = {s: 0 for s in self.symbol_list}
+        d: Dict[str, Union[int, pd.Timestamp]] = {s: 0 for s in self.symbol_list}
         d["datetime"] = self.start_date
 
         return [d]
 
-    def _construct_all_holdings(self) -> List[Dict[str, Union[int, datetime, float]]]:
+    def _construct_all_holdings(
+        self,
+    ) -> List[Dict[str, Union[int, pd.Timestamp, float]]]:
         """
         Docstring for _construct_all_holdings
 
@@ -109,7 +119,7 @@ class NaivePortfolio(Portfolio):
         The total amount of money is also given in the 'total' entry.
         """
 
-        d: Dict[str, Union[int, datetime, float]] = {s: 0 for s in self.symbol_list}
+        d: Dict[str, Union[int, pd.Timestamp, float]] = {s: 0 for s in self.symbol_list}
         d["datetime"] = self.start_date
         d["cash"] = self.initial_capital
         d["commission"] = 0.0
@@ -163,12 +173,12 @@ class NaivePortfolio(Portfolio):
         """
 
         # check the direction of the FillEvent: can only be 'BUY' or 'SELL'
-        fill_dir = 1 if fill_event.direction == "BUY" else -1
+        fill_dir: Literal[1, -1] = 1 if fill_event.direction == "BUY" else -1
 
         # estimate cost of fill by the current Close price
-        fill_cost = self.bars.get_latest_bars(fill_event.symbol)[0][5]
+        fill_cost: int | float = self.bars.get_latest_bars(fill_event.symbol)[0][5]
         # cost is the amount of money exiting the cash holdings
-        cost = fill_cost * fill_dir * fill_event.quantity
+        cost: int | float = fill_cost * fill_dir * fill_event.quantity
         # update the different dict entries accordingly
         self.current_holdings[fill_event.symbol] += cost
         self.current_holdings["commission"] += fill_event.commission
@@ -186,13 +196,13 @@ class NaivePortfolio(Portfolio):
         :rtype: OrderEvent | None
         """
 
-        symbol = signal_event.symbol
-        direction = signal_event.signal_type
+        symbol: Unknown | str = signal_event.symbol
+        direction: SignalType = signal_event.signal_type
         # strength = signal_event.strength, maybe include a strength attribute
 
         mkt_quantity = 100  # floor(100*strength)
-        cur_quantity = self.current_positions[symbol]
-        order_type = OrderType.MKT
+        cur_quantity: int = self.current_positions[symbol]
+        order_type: Literal[OrderType.MKT] = OrderType.MKT
 
         order = None
 
@@ -237,7 +247,7 @@ class NaivePortfolio(Portfolio):
         curve.set_index("datetime", inplace=True)
         curve["returns"] = curve["total"].pct_change()
         curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
-        self.equity_curve = curve
+        self.equity_curve: pd.DataFrame = curve
 
     def update_timeindex(self, event: MarketEvent) -> None:
         """
@@ -255,17 +265,25 @@ class NaivePortfolio(Portfolio):
             bars[ticker] = self.bars.get_latest_bars(ticker)
 
         # get and append current positions
-        dp = {**self.current_positions, "datetime": bars[self.symbol_list[0]][0][1]}
+        dp: dict[str, int | pd.Timestamp] = {
+            **self.current_positions,
+            "datetime": bars[self.symbol_list[0]][0][1],
+        }
         self.all_positions.append(dp)
 
         # get and append current holdings
-        dh = {**self.current_holdings, "datetime": bars[self.symbol_list[0]][0][1]}
+        dh: dict[str, int | float | pd.Timestamp] = {
+            **self.current_holdings,
+            "datetime": bars[self.symbol_list[0]][0][1],
+        }
 
         for ticker in self.symbol_list:
             # approximate the market value using the volume
             market_value: float = self.current_positions[ticker] * bars[ticker][0][5]
             dh[ticker] = market_value
-            dh["total"] += market_value  # ty: ignore
+            total: float = cast(typ=float, val=dh["total"])
+            total += market_value
+            dh["total"] = total
 
         self.all_holdings.append(dh)
 
@@ -296,6 +314,6 @@ class NaivePortfolio(Portfolio):
         the resulting OrderEvent on the events queue.
         """
         if signal_event.type == EventType.SIGNAL:
-            order_event = self._generate_naive_order(signal_event)
+            order_event: OrderEvent | None = self._generate_naive_order(signal_event)
             if order_event is not None:
                 self.events.put(order_event)

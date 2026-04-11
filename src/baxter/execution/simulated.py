@@ -4,7 +4,7 @@ from queue import Queue
 from baxter.event import Event, EventType
 from baxter.event.fill import FillEvent
 import datetime
-from typing import cast, Literal
+import pandas as pd
 
 
 class SimulatedExecutionHandler(ExecutionHandler):
@@ -22,12 +22,12 @@ class SimulatedExecutionHandler(ExecutionHandler):
     def execute_order(self, event: OrderEvent) -> None:
         if event.type == EventType.ORDER:
             fill_event = FillEvent(
-                direction=cast(Literal["BUY", "SELL"], event.direction),
+                direction=event.direction,
                 exchange="ARCA",
                 fill_cost=None,
                 quantity=event.quantity,
                 symbol=event.symbol,
-                time_index=datetime.datetime.now(datetime.timezone.utc),
+                time_index=pd.Timestamp.now(datetime.timezone.utc),
             )
 
             self.events.put(fill_event)

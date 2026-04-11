@@ -5,7 +5,6 @@ from baxter.event.market import MarketEvent
 from typing import List, Iterator, Dict, Hashable, Generator, Iterable
 import pandas as pd
 from pathlib import Path
-import datetime
 from data_validation import get_validated_data
 
 
@@ -41,11 +40,13 @@ class HistoricHDF5DataHandler(DataHandler):
         :type symbol_list: List[str]
         """
 
-        self.events = events
+        self.events: Queue[Event] = events
         self.hdf5_dir = Path(hdf5_dir)
-        self._symbol_list = symbol_list
+        self._symbol_list: Iterable[str] = symbol_list
 
-        self.symbol_data: dict[str, Iterator[tuple[Hashable, pd.Series[float]]]] = {}
+        self.symbol_data: dict[
+            str, Iterator[tuple[Hashable, pd.Series[float | int]]]
+        ] = {}
         self.latest_symbol_data: Dict[str, List[BarType]] = {}
         self._continue_backtest = True
 
@@ -111,7 +112,7 @@ class HistoricHDF5DataHandler(DataHandler):
             return [
                 (
                     f"unknown ticker: {symbol}",
-                    datetime.datetime.now(),
+                    pd.Timestamp.now(),
                     0.0,
                     0.0,
                     0.0,
@@ -182,14 +183,16 @@ class HistoricHDF5DataHandler(DataHandler):
         and corresponding to a single point in time. The columns correspond to
         'Ticker', 'Date', 'Open', 'High', 'Low',  'Close', 'Volume'.
         """
-        for datum in self.symbol_data[symbol]:
-            row = (
+        # tuple[str, datetime.datetime, float, int | float, int | float, int | float, int | float]
+        for date, datum in self.symbol_data[symbol]:
+            dt: pd.Timestamp = date  # ty: ignore
+            row: BarType = (
                 symbol,
-                datetime.datetime.strptime(str(datum[0]), "%Y-%m-%d %H:%M:%S"),
-                datum[1].iloc[0],
-                datum[1].iloc[1],
-                datum[1].iloc[2],
-                datum[1].iloc[3],
-                datum[1].iloc[4],
+                pd.to_datetime(pd.Timestamp(dt), format="%Y-%m-%d %H:%M:%S"),
+                datum.iloc[0],
+                datum.iloc[1],
+                datum.iloc[2],
+                datum.iloc[3],
+                datum.iloc[4],
             )
             yield row

@@ -1,7 +1,7 @@
 from baxter.event.event import Event
 from baxter.event.event import EventType
-from datetime import datetime
 from typing import Literal
+import pandas as pd
 
 
 class FillEvent(Event):
@@ -33,15 +33,15 @@ class FillEvent(Event):
         direction: Literal["BUY", "SELL"],
         exchange: str,
         fill_cost: float | None,
-        time_index: datetime,
+        time_index: pd.Timestamp,
     ):
-        self.symbol = symbol
-        self.quantity = quantity
-        self.direction = direction
-        self.exchange = exchange
-        self.fill_cost = fill_cost
+        self.symbol: str = symbol
+        self.quantity: int = quantity
+        self.direction: Literal["BUY", "SELL"] = direction
+        self.exchange: str = exchange
+        self.fill_cost: int | float | None = fill_cost
         self.commission = 0.0  # should be able to set
-        self.time_index = time_index
+        self.time_index: pd.Timestamp = time_index
 
     def __repr__(self) -> str:
         return f"{self.direction} {self.quantity} shares of {self.symbol} on {self.exchange} at {self.time_index}"
