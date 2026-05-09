@@ -1,24 +1,23 @@
-from typing import Iterable
+from baxter.strategy import Strategy
+from typing import Iterable, Type
 from queue import Empty
 from ..event import SignalEvent, MarketEvent, OrderEvent, FillEvent, Event
-from ..backtest.initialization import initialize_algorithm, CalcSignal
+from ..backtest.initialization import initialize_algorithm
 from ..portfolio import Portfolio
 import pandas as pd
 
 
 def run_algorithm(
     symbols: Iterable[str],
-    calculate_signals: CalcSignal,
-    N: int,
+    strategyClass: Type[Strategy],
     start_date: pd.Timestamp,
     end_date: pd.Timestamp,
 ) -> Portfolio:
     events, bars, strategy, pf, broker = initialize_algorithm(
         symbols=symbols,
-        calculate_signals=calculate_signals,
-        N=N,
+        strategyClass=strategyClass,
         start_date=start_date,
-        end_date=end_date,
+        end_date=end_date
     )
 
     while bars.continue_backtest:

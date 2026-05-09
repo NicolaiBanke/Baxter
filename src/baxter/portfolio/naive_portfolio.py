@@ -1,4 +1,3 @@
-from ty_extensions import Unknown
 from baxter.event import Event
 from baxter.event.fill import FillEvent
 from baxter.event.signal import SignalEvent
@@ -196,7 +195,7 @@ class NaivePortfolio(Portfolio):
         :rtype: OrderEvent | None
         """
 
-        symbol: Unknown | str = signal_event.symbol
+        symbol: str = signal_event.symbol
         direction: SignalType = signal_event.signal_type
         # strength = signal_event.strength, maybe include a strength attribute
 

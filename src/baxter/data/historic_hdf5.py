@@ -146,7 +146,7 @@ class HistoricHDF5DataHandler(DataHandler):
 
             # check if comb_index has been set yet, and set it if it hasn't, otherwise combine it with the already defined comb_index
             if comb_index is None:
-                comb_index = data.index
+                comb_index: pd.DatetimeIndex = data.index  # ty: ignore
             else:
                 comb_index.union(data.index)
 
