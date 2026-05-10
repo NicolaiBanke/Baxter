@@ -23,7 +23,7 @@ type InitAlgo = tuple[Queue[Event], DataHandler, Strategy, Portfolio, ExecutionH
 
 def initialize_algorithm(
     symbols: Iterable[str],
-    strategyClass: Type[Strategy],
+    strategy_class: Type[Strategy],
     start_date: pd.Timestamp,
     end_date: pd.Timestamp = pd.Timestamp.now(),
 ) -> InitAlgo:
@@ -33,9 +33,11 @@ def initialize_algorithm(
     bars: DataHandler = HistoricHDF5DataHandler(events, DATA_PATH / "data.h5", symbols)
 
     # portfolio and execution handler can also be defaults for now
-    pf: Portfolio = NaivePortfolio(events=events, bars=bars, start_date=start_date, end_date=end_date)
+    pf: Portfolio = NaivePortfolio(
+        events=events, bars=bars, start_date=start_date, end_date=end_date
+    )
     broker: ExecutionHandler = SimulatedExecutionHandler(events=events)
 
-    strategy: Strategy = strategyClass(bars, events)
+    strategy: Strategy = strategy_class(bars=bars, events=events)
 
     return events, bars, strategy, pf, broker

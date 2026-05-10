@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from baxter.event.signal import SignalEvent
 from baxter.event.fill import FillEvent
 from baxter.event.market import MarketEvent
+import pandas as pd
 
 
 class Portfolio(ABC):
@@ -12,6 +13,11 @@ class Portfolio(ABC):
     class must implement methods to handle received SignalEvent and
     FillEvent.
     """
+
+    @property
+    @abstractmethod
+    def equity_curve(self) -> pd.DataFrame:
+        raise NotImplementedError("Should have equity_curve property")
 
     @abstractmethod
     def update_signal(self, signal_event: SignalEvent) -> None:

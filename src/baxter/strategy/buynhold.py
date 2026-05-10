@@ -18,11 +18,11 @@ class BuyAndHoldStrategy(Strategy):
         :param events: The events queue.
         :type events: Queue
         """
-        self.bars = bars
-        self.events = events
+        self.bars: DataHandler = bars
+        self.events: Queue[Event] = events
 
         # the list of ticker symbols
-        self.symbol_list = bars.symbol_list
+        self.symbol_list: list[str] = bars.symbol_list
 
         # a dict indicating whether the symbols have been bought
         self.bought: dict[str, bool] = self._calculate_initial_bought()

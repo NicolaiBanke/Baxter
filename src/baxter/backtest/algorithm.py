@@ -9,15 +9,15 @@ import pandas as pd
 
 def run_algorithm(
     symbols: Iterable[str],
-    strategyClass: Type[Strategy],
     start_date: pd.Timestamp,
     end_date: pd.Timestamp,
+    strategy_class: Type[Strategy],
 ) -> Portfolio:
     events, bars, strategy, pf, broker = initialize_algorithm(
         symbols=symbols,
-        strategyClass=strategyClass,
+        strategy_class=strategy_class,
         start_date=start_date,
-        end_date=end_date
+        end_date=end_date,
     )
 
     while bars.continue_backtest:
