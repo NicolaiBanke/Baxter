@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Type
 from baxter.data import DataHandler, HistoricHDF5DataHandler
 from queue import Queue
 from baxter.event import Event
@@ -6,7 +6,6 @@ from baxter.strategy import Strategy
 from baxter.portfolio import Portfolio, NaivePortfolio
 from baxter.execution import ExecutionHandler, SimulatedExecutionHandler
 from pathlib import Path
-from ..factories import strategy_factory, CalcSignal
 import os
 import pandas as pd
 
@@ -24,10 +23,9 @@ type InitAlgo = tuple[Queue[Event], DataHandler, Strategy, Portfolio, ExecutionH
 
 def initialize_algorithm(
     symbols: Iterable[str],
-    calculate_signals: CalcSignal,
-    N: int,
+    strategy_class: Type[Strategy],
     start_date: pd.Timestamp,
-    end_date: pd.Timestamp = pd.Timestamp().now(),
+    end_date: pd.Timestamp = pd.Timestamp.now(),
 ) -> InitAlgo:
 
     events: Queue[Event] = Queue()
@@ -35,9 +33,11 @@ def initialize_algorithm(
     bars: DataHandler = HistoricHDF5DataHandler(events, DATA_PATH / "data.h5", symbols)
 
     # portfolio and execution handler can also be defaults for now
-    pf: Portfolio = NaivePortfolio(events=events, bars=bars, start_date=start_date)
+    pf: Portfolio = NaivePortfolio(
+        events=events, bars=bars, start_date=start_date, end_date=end_date
+    )
     broker: ExecutionHandler = SimulatedExecutionHandler(events=events)
 
-    strategy: Strategy = strategy_factory(N)(calculate_signals)(bars, events)
+    strategy: Strategy = strategy_class(bars=bars, events=events)
 
     return events, bars, strategy, pf, broker

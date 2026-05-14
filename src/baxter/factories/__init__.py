@@ -1,3 +1,3 @@
-from .strategy_factory import strategy_factory, CalcSignal
+from .strategy_factory import strategy_factory
 
-__all__ = ["strategy_factory", "CalcSignal"]
+__all__: list[str] = ["strategy_factory"]

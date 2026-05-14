@@ -1,15 +1,14 @@
 from ..event import MarketEvent, Event, EventType, SignalEvent, SignalType
 from ..strategy import Strategy
-from typing import Callable
+from typing import Callable, Type
 from ..data import DataHandler, BarType
 from queue import Queue
 
-type InitStrategy = Callable[[DataHandler, Queue[Event]], Strategy]
 type CalcSignal = Callable[[list[BarType]], None | SignalType]
 
 
-def strategy_factory(N: int) -> Callable[[CalcSignal], InitStrategy]:
-    def wrapper(_calculate_signals: CalcSignal) -> InitStrategy:
+def strategy_factory(N: int) -> Callable[[CalcSignal], Type[Strategy]]:
+    def wrapper(_calculate_signals: CalcSignal) -> Type[Strategy]:
         class GenericStrategy(Strategy):
             def __init__(self, bars: DataHandler, events: Queue[Event]) -> None:
                 self.bars: DataHandler = bars

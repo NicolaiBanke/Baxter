@@ -1,3 +1,6 @@
+from baxter.event import Event
+from queue import Queue
+from baxter.data import DataHandler
 from abc import ABC, abstractmethod
 from baxter.event.market import MarketEvent
 
@@ -11,6 +14,12 @@ class Strategy(ABC):
     method to calculate the signals, based on the data provided by
     the DataHandler subclassed instance.
     """
+
+    @abstractmethod
+    def __init__(self, bars: DataHandler, events: Queue[Event]):
+        raise NotImplementedError(
+            "Strategy must be initialized with a DataHandler and Event Queue"
+        )
 
     @abstractmethod
     def calculate_signals(self, event: MarketEvent) -> None:
