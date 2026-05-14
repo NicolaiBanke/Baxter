@@ -2,6 +2,7 @@ import aiohttp
 import pytest
 
 
+@pytest.mark.skip(reason="no valid saxo api key")
 @pytest.mark.asyncio
 async def test_execute_order(saxo_execution_handler, mkt_order):
     async with aiohttp.ClientSession(
